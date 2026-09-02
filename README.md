@@ -1,0 +1,466 @@
+<h1 align="center">Hoza YT</h1>
+
+<p align="center">
+  A browser extension and a local app that download video and audio from the web —
+  at the quality the source actually offers, and nothing it does not.
+</p>
+
+<p align="center">
+  <img alt="Manifest V3" src="https://img.shields.io/badge/Manifest-V3-4c8dff">
+  <img alt="Chrome 116+" src="https://img.shields.io/badge/Chrome-116%2B-4c8dff">
+  <img alt="Python 3.10+" src="https://img.shields.io/badge/Python-3.10%2B-4c8dff">
+  <img alt="No build step" src="https://img.shields.io/badge/build-none-34d399">
+  <img alt="Local only" src="https://img.shields.io/badge/data-stays%20local-34d399">
+</p>
+
+---
+
+## What it looks like
+
+### On YouTube
+
+The **Hoza YT** button sits in the row with Like, Share and Save. Pressing it
+opens the panel directly underneath, without leaving the video.
+
+| Video qualities | Audio qualities |
+|---|---|
+| ![The panel on a YouTube video, listing every video quality with 1080p VP9 chosen](docs/youtube-video-qualities.png) | ![The same panel on its Audio tab, listing every track with a 152 kbps Opus track chosen](docs/youtube-audio-qualities.png) |
+
+Every line is a stream the video genuinely offers — resolution, codec,
+container and size — and the button underneath downloads exactly the one you
+picked. Nothing is re-encoded, and no quality is invented.
+
+| The button in the action row | The Dashboard section |
+|---|---|
+| ![The Hoza YT button beside Share and Save, with the quality panel open beneath it](docs/youtube-panel.png) | ![The panel's Dashboard section, offering to open the main dashboard](docs/youtube-dashboard-tab.png) |
+
+### The dashboard
+
+The local app serves its own dashboard at `127.0.0.1:8765`. The panel's
+Dashboard section opens it with the video already loaded.
+
+| Paste a link and analyse it | Every quality the link offers |
+|---|---|
+| ![The Download page: a pasted YouTube link, the media card, and the Smart Quality presets](docs/dashboard-download.png) | ![The same page scrolled down, showing all 28 video streams as a grid](docs/dashboard-all-qualities.png) |
+
+| The dashboard in the browser | History |
+|---|---|
+| ![The Download page at 127.0.0.1:8765, with stream counts, subtitles and upload date](docs/dashboard-analyse.png) | ![The History page: records, completed, failed and total size, over a table of finished downloads](docs/dashboard-history.png) |
+
+| Settings | Servers |
+|---|---|
+| ![Settings: download folder, default media type and quality, and the filename template](docs/dashboard-settings.png) | ![The Servers page: backend health, adding a second machine, and failover options](docs/dashboard-servers.png) |
+
+![The About page: version, developer, bundled ffmpeg and Python versions, and what the application will not do](docs/dashboard-about.png)
+
+> Some of these were taken before the rename, so the interface in them still
+> says **HOZA Download**. It is the same application.
+
+---
+
+## The two halves
+
+Hoza YT is two programs that work together, and either works alone.
+
+| | What it is | What it handles |
+|---|---|---|
+| **The extension** (`src/`) | A Manifest V3 extension. No build step, no dependencies, no bundler. | Media a page exposes openly: `<video>`, `<audio>`, direct links, HLS and DASH manifests. |
+| **The local app** (`server/`) | A small FastAPI service with its own dashboard at `127.0.0.1:8765`. | YouTube, which signs and throttles its stream URLs — so it needs `yt-dlp` and `ffmpeg`, which an extension cannot carry. |
+
+They meet on the YouTube page itself: the extension puts a button in the
+action row, and the panel behind it talks to the local app.
+
+---
+
+## On YouTube
+
+The extension adds a **Hoza YT** button in the same row as Like, Share and
+Save. Pressing it opens a panel anchored underneath with five sections:
+
+| Section | What it shows |
+|---|---|
+| **Video** | Every video quality the link offers — resolution, frame rate, codec, container, HDR, size. Pick one, download it. |
+| **Audio** | Every audio track — bitrate, codec, channels, sample rate, size. Tracks with compressed dynamic range are labelled `DRC`. |
+| **Dashboard** | Opens the full dashboard, with this video already loaded. |
+| **About** | Developer, contact, and the exact versions of the app, extension, yt-dlp, FFmpeg and Python. |
+| **Downloads** | The live queue: progress, speed and time remaining, updating while you watch. |
+
+The button is never absent. It takes the best place available and verifies it
+actually landed there:
+
+1. the **action row**, beside Like and Share;
+2. beside **Subscribe**, for older layouts;
+3. the **top bar**, on pages with no video — home, search, channels;
+4. a **floating pill**, if the page offers nothing to sit beside.
+
+Scroll down into the comments and a pill fades in at the corner, so the panel
+stays one click away. Open the home page and the button sits in the top bar;
+click into a video and it moves down into the action row by itself.
+
+---
+
+## Install
+
+### 1. The local app
+
+Needed for YouTube. Python 3.10 or newer.
+
+```bash
+pip install -r server/requirements.txt
+python server/server.py
+
+# On Windows that first run is the last one you have to think about: it sets
+# the server up to come and go with your browser by itself.
+```
+
+It serves `http://127.0.0.1:8765`, binding to loopback by default (`--host`
+changes that). `yt-dlp` and a bundled `ffmpeg` (via `imageio-ffmpeg`) come in
+as dependencies — nothing has to be on your `PATH`.
+
+#### Never starting it by hand (Windows)
+
+A browser extension cannot launch a program on your machine, so the server has
+to already be running when you click the toolbar button. Nothing has to be set
+up for that to be true: **the first time the server is ever started — however
+it is started — it registers itself and never needs starting again.**
+
+That one local run is unavoidable. An extension cannot launch a program on your
+machine, so something has to go first; `server.py` makes sure it only ever
+happens once, and that it is the run you were doing anyway.
+
+From then on the server's lifetime is the browser's. It starts a few seconds
+after the first browser window opens and stops about 25 seconds after the last
+one closes, so nothing is left running once there is nobody to serve. A
+download still in progress holds it open until the file is finished.
+
+Nothing below is required. It is here for when you want to look, or to change
+your mind:
+
+| Command | What it does |
+| --- | --- |
+| `python server/autorun.py --install` | Set it up now rather than on the first server start, and re-sync the installed copy after editing the code. |
+| `python server/autorun.py --status` | Is a browser open? Is the server up? Where is the log? |
+| `python server/autorun.py --stop` | Stops the server and autorun now. |
+| `python server/autorun.py --uninstall` | Removes the task and stops everything for good. |
+| `python server/autorun.py --update` | Run when downloads start failing. YouTube changes often. |
+| `python server/server.py` | Starts the server by hand, in a window you can watch. |
+
+There is no separate watchdog, and no `.bat`, `.ps1` or `.vbs`: all of it is
+Python, driving `schtasks` and the registry, both of which ship with Windows.
+
+**How it stays up.** Autorun looks for a browser every 3 seconds and asks
+`/api/health` every 15, restarting the server on either kind of failure:
+
+- the process **died** — seen through the child's exit code
+- the process **hung** — seen through three silent health checks in a row,
+  which a plain restart-on-exit loop never catches
+
+Failed starts back off (5s → 15s → 30s → 1m → 2m → 5m) so a broken install
+cannot spin the CPU, a lock file keeps two copies from fighting over the port,
+and an already-running server is adopted rather than duplicated. It logs to
+`data/autorun.log`, rotated at 1 MB.
+
+**And something watches autorun.** The scheduled task carries two triggers: one
+at sign-in, and one that repeats every ten minutes forever. The repeating one
+costs nothing while autorun is alive — `MultipleInstances` is `IgnoreNew`, so
+the task simply declines to start a second copy — and it is what brings autorun
+back if the process is ever killed.
+
+The task runs as you, at sign-in, with no time limit. **No administrator
+rights** — and if policy blocks task registration, the installer falls back to
+a per-user `Run` registry entry on its own. Nothing shows a console window:
+`pythonw.exe` runs autorun, and autorun spawns the server with
+`CREATE_NO_WINDOW`.
+
+`--install` copies the server to `%LOCALAPPDATA%\HozaYT\server` and runs it
+from there, so emptying or re-downloading the project cannot take the running
+copy with it. Re-run `--install` after editing the server to update that copy,
+or pass `--here` to run from the project folder instead.
+
+Recovery times, worst case:
+
+| What died | Back up within |
+| --- | --- |
+| the server crashed or hung | ~45 seconds |
+| autorun itself was killed | ~10 minutes |
+| the machine was restarted | sign-in, plus 15 seconds |
+
+### 2. The extension
+
+**Chrome / Edge**
+
+1. Open `chrome://extensions` (or `edge://extensions`).
+2. Turn on **Developer mode**.
+3. **Load unpacked**, and select this folder.
+
+**Firefox** — the code runs against a compatibility layer, and Firefox's event
+page has DOM access, so segment assembly happens inline there rather than in an
+offscreen document. Load it through `about:debugging` → **This Firefox** →
+**Load Temporary Add-on**, selecting `manifest.json`.
+
+The extension asks for **no site access at all** on first run. You grant each
+site from the panel, and can revoke it at any time from the browser's
+extensions page. The one exception is `127.0.0.1:8765`, declared in the
+manifest so the panel can reach the local app.
+
+---
+
+## What it deliberately does not do
+
+These are limits by design, not gaps waiting to be filled.
+
+**It does not circumvent protection.** When a page negotiates Encrypted Media
+Extensions, an HLS playlist carries `#EXT-X-KEY`, or a DASH manifest carries
+`<ContentProtection>`, it reports that the media is protected and stops. There
+is no key handling and no DRM path. Media behind a paywall or a login is not a
+target.
+
+**It does not invent quality.** The list shows what the source serves. There is
+no "320 kbps MP3" generated from a 128 kbps Opus source.
+
+**It does not download live streams.** A stream with no declared end has no
+well-defined file to produce.
+
+**The extension alone does not merge separate video and audio tracks.** Muxing
+needs an encoder. Where a source separates them, the options are labelled
+*Video only* and *Audio only*. The local app does merge them, because it has
+ffmpeg.
+
+---
+
+## Architecture
+
+```
+manifest.json                 MV3 manifest — no host permissions but the local app
+docs/                         The screenshots used by this README
+
+src/                          The extension
+  core/                       Pure logic, no browser APIs
+    constants.js              Message types, enums, thresholds
+    errors.js                 Error taxonomy: codes -> what the user reads
+    hls-parser.js             HLS master and media playlists
+    dash-parser.js            MPD parsing and segment plans
+    xml.js                    Dependency-free XML reader (workers lack DOMParser)
+    quality-resolver.js       Ranking, badges, smart presets
+    filename.js               Template rendering and cross-platform sanitising
+    dedupe.js                 URL normalising and duplicate detection
+    assembler.js              Ordered segment fetch and join
+    settings.js  storage.js  browser-compat.js  format-utils.js
+
+  background/                 Service worker and collaborators
+    service-worker.js         Message router and lifecycle
+    local-server.js           Bridge to the local app, so the page never calls it
+    media-registry.js         Per-tab detected media, in memory only
+    net-observer.js           Read-only webRequest media sniffing
+    manifest-probe.js         Fetch, parse and resolve streams
+    download-manager.js       Native downloads and segment assembly
+    queue-manager.js          Jobs, concurrency, persistence, recovery
+    history.js  notifications.js  context-menu.js  offscreen-bridge.js
+
+  content/
+    panel.js                  The YouTube button and its in-page panel
+    detector.js               DOM scan (isolated world, no imports by necessity)
+    page-probe.js             EME observation (MAIN world, read-only)
+
+  offscreen/                  Blob assembly host — workers cannot make blob URLs
+  ui/                         popup, download manager, settings
+
+server/                       The local app
+  server.py                   Launcher
+  app/
+    main.py                   HTTP API and static hosting
+    analyzer.py               yt-dlp extraction, normalised into streams
+    formats.py                Presets, audio tiers, format selection
+    jobs.py                   Queue, progress, pause/resume/retry
+    downloader.py             The download itself, with disk guards
+    ffmpeg.py                 Probe and merge
+    db.py  config.py  security.py  servers.py  diagnostics.py  logs.py
+  static/                     The dashboard
+```
+
+**Data flow, extension.** `detector` and `net-observer` feed `media-registry`.
+`manifest-probe` turns a registry item into ranked streams. The UI renders
+those, and a choice becomes a job in `queue-manager`.
+
+**Data flow, YouTube.** `panel.js` asks the service worker, the service worker
+asks the local app, the local app runs `yt-dlp` and merges with `ffmpeg`. The
+page itself never calls the API — the server accepts only extension and
+loopback origins, so a content script's request would be refused anyway.
+
+### Two design notes
+
+**Why an offscreen document.** Chromium service workers have no
+`URL.createObjectURL`. Joined segments have to become a blob URL somewhere, so
+assembly happens in an offscreen document and the worker hands the resulting
+URL to `chrome.downloads`. Firefox event pages have DOM access, so the same
+assembler runs inline — the branch is a feature probe, not a UA check.
+
+**Why segment joining works without an encoder.** MPEG-TS segments concatenate
+into a playable `.ts`. Fragmented MP4 segments concatenate behind their
+initialisation segment into a playable `.mp4`. Both are byte-exact joins — and
+that is precisely why merging *separate* video and audio tracks is a different
+problem: that is muxing, not concatenation.
+
+---
+
+## The dashboard
+
+`http://127.0.0.1:8765` — Dashboard, Download, Video, Audio, Queue, History,
+Servers, Settings, Diagnostics, Logs and About.
+
+Paste a link and it is analysed on paste. Pick a preset (**Best**,
+**Recommended**, **Best Compatibility**, **Data Saver**) or a specific format,
+and it downloads with live progress, pause, resume, retry and cancel.
+Downloads default to `~/Downloads/Hoza YT`.
+
+### API
+
+| Method | Path | Purpose |
+|---|---|---|
+| `GET` | `/api/health` | Status, queue counts, ffmpeg availability, metrics |
+| `GET` | `/api/about` | App, developer, contact, versions |
+| `POST` | `/api/analyze` | Every quality a link offers, plus presets and audio tiers |
+| `POST` | `/api/jobs` | Queue a download from a verified format selection |
+| `GET` | `/api/jobs` | The queue, with progress and stats |
+| `POST` | `/api/jobs/{id}/{pause\|resume\|cancel\|retry}` | Control one job |
+| `GET` | `/api/events` | Server-sent events: job created, progress, finished |
+| `GET` | `/api/history` | Completed and failed records |
+| `GET` `PUT` | `/api/settings` | Read and update configuration |
+| `GET` | `/api/diagnostics` | Self-checks: ffmpeg, extractor, disk, network |
+| `GET` | `/api/logs` | Recent log records, filterable |
+
+Every request body is validated at the boundary by Pydantic. Requests are rate
+limited (120/minute by default) and capped in size, URLs are checked against
+SSRF into the local network, and every path the app writes is contained inside
+a directory you approved.
+
+---
+
+## Permissions
+
+| Permission | Why |
+|---|---|
+| `downloads` | Save files and report progress |
+| `storage`, `unlimitedStorage` | Settings and history, locally |
+| `activeTab` | Scan the current page when you open the panel |
+| `scripting` | Run that scan |
+| `webRequest` *(optional)* | Observe media responses on granted sites, read-only |
+| `offscreen` | Join segments into one file |
+| `notifications` | Report completion and failure |
+| `contextMenus` | Right-click entries |
+| `tabs` | Title and address of the tab a download came from |
+| `alarms` | Queue upkeep |
+| `http://127.0.0.1:8765/*` | Reach the local app |
+
+`webRequest` is *optional* rather than required, and is requested from the
+panel the first time you grant a site. Declaring it up front with no host
+permissions makes Chrome warn at load time that it can never fire — asking at
+the moment it becomes useful is quieter and more honest.
+
+## Privacy
+
+Everything stays on the device. Settings and history go to local extension
+storage and a local SQLite file; detected media lives in memory for the open
+tab and is dropped when that tab navigates away. No analytics, no telemetry,
+no third-party scripts, no remote code. Page contents are never uploaded, and
+the local app listens on loopback unless you tell it otherwise.
+
+`server/data/` — the database, your resolved configuration and the temporary
+directory — is git-ignored, because it is this machine's download history.
+
+---
+
+## Keyboard shortcuts
+
+| Shortcut | Action |
+|---|---|
+| `Alt+Shift+D` | Open the panel |
+| `Alt+Shift+Q` | One-click download at your preferred quality |
+| `Alt+Shift+M` | Open the download manager |
+
+## Filename templates
+
+Extension default: `{title} - {quality}` → `How Lenses Bend Light - 1080p.mp4`
+
+Tokens: `{title}` `{quality}` `{resolution}` `{codec}` `{audiocodec}`
+`{container}` `{fps}` `{duration}` `{domain}` `{date}` `{time}` `{index}`
+
+Reserved Windows device names, illegal characters, control characters, trailing
+dots and path traversal are all handled. Collisions become `Video (1).mp4`.
+The local app uses yt-dlp tokens instead: `%(title)s`, `%(height)s`,
+`%(uploader)s`, `%(id)s`.
+
+---
+
+## Continuous integration
+
+Three workflows run in GitHub Actions.
+
+| Workflow | When | What it does |
+| --- | --- | --- |
+| `ci.yml` | every push and pull request | Installs the server on Python 3.10 and 3.12, byte-compiles it, imports the app and asserts the expected routes exist, then boots the server and calls `/api/health`. Separately checks that every file `manifest.json` points at actually exists, and that every module under `src/` parses. |
+| `release.yml` | a `v*` tag | Refuses to build if the tag and `manifest.json` disagree, packs `manifest.json`, `src/` and `icons/` into `hoza-yt-<tag>.zip`, and attaches it to a GitHub release. |
+| `yt-dlp-watch.yml` | Mondays, 06:00 UTC | Compares the pin in `server/requirements.txt` against PyPI and keeps one rolling issue open when it has fallen behind. YouTube breaks downloads regularly and a stale `yt-dlp` is nearly always why. |
+
+### What Actions cannot do
+
+It cannot host the server. Jobs are capped at six hours, the runner is
+destroyed when the job ends, nothing can reach it from outside without a
+tunnel, and GitHub's Actions policy limits the service to work on the
+repository itself — a long-lived server or tunnel is grounds for suspension.
+
+It would not help anyway. Downloads would land on GitHub's disk rather than
+yours, the extension talks to `127.0.0.1:8765`, and YouTube blocks datacenter
+addresses hard enough that `yt-dlp` fails on a runner almost immediately.
+
+The server is meant to be local. `autorun.py` is what makes it start and stop
+with your browser.
+
+### Release checks
+
+`/api/updates` asks GitHub whether a newer release exists, at most once a day:
+
+```bash
+curl http://127.0.0.1:8765/api/updates
+```
+
+Nothing needs configuring. The repository is read from `git remote get-url
+origin`, overridden by `HOZA_GITHUB_REPO` if it is set, and the check reports
+itself `disabled` when there is no remote. A private repository or one with no
+releases reports `unavailable`, which is a state and not an error.
+
+---
+
+## Troubleshooting
+
+**The button is not on YouTube.** Reload the extension at `chrome://extensions`,
+then hard-refresh the tab (`Ctrl+Shift+R`). It logs one line on mount —
+`[Hoza YT] Download button mounted (actions)` — which tells you where it went.
+
+**"The Hoza YT app is not running."** It should come up with your browser on
+its own. `python server/autorun.py --status` says what is running, and
+`data/autorun.log` says what happened. `python server/autorun.py --install`
+sets it up again if the task was removed.
+
+**Downloads suddenly fail on YouTube.** YouTube changes often. Run
+`python server/autorun.py --update`, or `pip install -U yt-dlp`.
+
+**A second instance on the same machine** needs its own state:
+`python server/server.py --data-dir <path>`.
+
+---
+
+## Developer
+
+**Rahoz Osman** — <hozahoza2001@gmail.com>
+
+Shown under **About** in both the panel and the dashboard. The manifest carries
+`"author": { "email": ... }`, the only authorship key Chrome recognises — a
+`developer` key makes Chrome log *Unrecognized manifest key*, so the name lives
+in the About section instead.
+
+## Responsible use
+
+Hoza YT is for media you are authorised to download. Respect the terms of the
+sites you visit and the rights of the people who made what you are saving. The
+protection boundaries above are not configurable.

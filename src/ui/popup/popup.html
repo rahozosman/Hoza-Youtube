@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Hoza YT</title>
+    <link rel="stylesheet" href="../shared/tokens.css" />
+    <link rel="stylesheet" href="../shared/components.css" />
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body class="popup">
+    <header class="pop-header">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-name">Hoza YT</span>
+      </div>
+      <div class="pop-header-actions">
+        <button
+          id="rescan"
+          class="btn btn-ghost btn-icon"
+          type="button"
+          title="Scan this page again"
+          aria-label="Scan this page again"
+        ></button>
+        <button
+          id="open-settings"
+          class="btn btn-ghost btn-icon"
+          type="button"
+          title="Settings"
+          aria-label="Settings"
+        ></button>
+        <button
+          id="open-youtube-server"
+          class="btn btn-ghost btn-icon"
+          type="button"
+          title="Open local media downloader"
+          aria-label="Open local media downloader"
+        ></button>
+      </div>
+    </header>
+
+    <main id="body" class="pop-body">
+      <!-- Detection states, media card and quality picker are rendered here. -->
+      <div class="state">
+        <div class="state-icon"><span class="spinner"></span></div>
+        <p class="state-title">Looking for media</p>
+        <p class="state-body">Checking what this page makes available.</p>
+      </div>
+    </main>
+
+    <footer class="pop-footer">
+      <button id="open-manager" class="btn btn-ghost btn-sm" type="button">
+        <span id="manager-label">Downloads</span>
+      </button>
+      <div id="queue-summary" class="queue-summary faint"></div>
+    </footer>
+
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>

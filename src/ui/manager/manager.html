@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Downloads — Hoza YT</title>
+    <link rel="stylesheet" href="../shared/tokens.css" />
+    <link rel="stylesheet" href="../shared/components.css" />
+    <link rel="stylesheet" href="manager.css" />
+  </head>
+  <body>
+    <div class="shell">
+      <header class="page-header">
+        <div class="page-header-main">
+          <div class="brand">
+            <span class="brand-mark" aria-hidden="true"></span>
+            <div>
+              <h1>Downloads</h1>
+              <p class="muted" id="header-summary">Loading</p>
+            </div>
+          </div>
+
+          <div class="page-header-actions">
+            <button id="pause-all" class="btn btn-sm" type="button">Pause all</button>
+            <button id="resume-all" class="btn btn-sm" type="button">Resume all</button>
+            <button id="settings" class="btn btn-sm btn-ghost" type="button">Settings</button>
+          </div>
+        </div>
+
+        <nav class="tabs" role="tablist">
+          <button class="tab" type="button" role="tab" data-tab="active" aria-selected="true">
+            Active <span class="tab-count" id="count-active">0</span>
+          </button>
+          <button class="tab" type="button" role="tab" data-tab="completed" aria-selected="false">
+            Completed <span class="tab-count" id="count-completed">0</span>
+          </button>
+          <button class="tab" type="button" role="tab" data-tab="failed" aria-selected="false">
+            Failed <span class="tab-count" id="count-failed">0</span>
+          </button>
+        </nav>
+      </header>
+
+      <div class="toolbar">
+        <div class="search">
+          <input
+            type="search"
+            id="filter"
+            placeholder="Filter by name"
+            aria-label="Filter downloads by name"
+          />
+        </div>
+        <button id="clear" class="btn btn-sm btn-ghost btn-danger" type="button">Clear list</button>
+      </div>
+
+      <main id="list" class="list" role="tabpanel" aria-live="polite"></main>
+    </div>
+
+    <script type="module" src="manager.js"></script>
+  </body>
+</html>
