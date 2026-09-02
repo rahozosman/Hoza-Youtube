@@ -51,6 +51,7 @@ def _port_free(host: str, port: int) -> bool:
             return False
 
 
+<<<<<<< HEAD
 def _bootstrap(host: str, port: int) -> None:
     """Hand off to autorun, which decides whether there is anything to do."""
     try:
@@ -62,6 +63,8 @@ def _bootstrap(host: str, port: int) -> None:
         pass
 
 
+=======
+>>>>>>> 69b39e3a1642109c7928230fe0e05911862f162f
 def main() -> int:
     parser = argparse.ArgumentParser(description="Hoza YT server")
     parser.add_argument("--port", type=int, default=8765)
@@ -69,12 +72,15 @@ def main() -> int:
     parser.add_argument("--no-browser", action="store_true")
     parser.add_argument("--reload", action="store_true", help="reload on code changes")
     parser.add_argument(
+<<<<<<< HEAD
         "--no-bootstrap",
         action="store_true",
         help="do not set the server up to start with the browser (Windows). "
              "The first run does that by itself, so nothing else is manual.",
     )
     parser.add_argument(
+=======
+>>>>>>> 69b39e3a1642109c7928230fe0e05911862f162f
         "--data-dir",
         help="where this instance keeps its database and configuration. "
              "A second instance on the same machine needs its own.",
@@ -122,6 +128,7 @@ def main() -> int:
     if not args.no_browser:
         threading.Timer(1.0, lambda: webbrowser.open(url)).start()
 
+<<<<<<< HEAD
     # An extension cannot start a program, so one local run has to happen
     # before anything can be automatic. This makes it this one: the first time
     # the server is ever started it registers autorun, and from then on the
@@ -132,6 +139,8 @@ def main() -> int:
             target=_bootstrap, args=(args.host, args.port), daemon=True
         ).start()
 
+=======
+>>>>>>> 69b39e3a1642109c7928230fe0e05911862f162f
     uvicorn.run(
         "app.main:app",
         host=args.host,

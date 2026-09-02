@@ -83,7 +83,11 @@ jobs:
           On any machine already running the server:
 
           \`\`\`
+<<<<<<< HEAD
           python server/autorun.py --update
+=======
+          server/update-yt-dlp.bat
+>>>>>>> 69b39e3a1642109c7928230fe0e05911862f162f
           \`\`\`
 
           To raise the floor in the repository, edit \`server/requirements.txt\`:

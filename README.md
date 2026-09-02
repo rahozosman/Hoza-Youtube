@@ -106,11 +106,20 @@ click into a video and it moves down into the action row by itself.
 Needed for YouTube. Python 3.10 or newer.
 
 ```bash
+<<<<<<< HEAD
 pip install -r server/requirements.txt
 python server/server.py
 
 # On Windows that first run is the last one you have to think about: it sets
 # the server up to come and go with your browser by itself.
+=======
+# Windows: double-click server/install-service.bat — it installs what it
+# needs, starts the server now, and keeps it running from then on.
+
+# Any platform:
+pip install -r server/requirements.txt
+python server/server.py
+>>>>>>> 69b39e3a1642109c7928230fe0e05911862f162f
 ```
 
 It serves `http://127.0.0.1:8765`, binding to loopback by default (`--host`
@@ -120,6 +129,7 @@ as dependencies — nothing has to be on your `PATH`.
 #### Never starting it by hand (Windows)
 
 A browser extension cannot launch a program on your machine, so the server has
+<<<<<<< HEAD
 to already be running when you click the toolbar button. Nothing has to be set
 up for that to be true: **the first time the server is ever started — however
 it is started — it registers itself and never needs starting again.**
@@ -150,12 +160,30 @@ Python, driving `schtasks` and the registry, both of which ship with Windows.
 
 **How it stays up.** Autorun looks for a browser every 3 seconds and asks
 `/api/health` every 15, restarting the server on either kind of failure:
+=======
+to already be running when you click the toolbar button. `install-service.bat`
+is the one thing you run, once:
+
+| Script | What it does |
+| --- | --- |
+| `server/install-service.bat` | **Run once.** Installs dependencies, registers the sign-in task, starts the watchdog now. |
+| `server/status.bat` | Is the server up? Is the watchdog up? Where is the log? |
+| `server/stop-server.bat` | Stops the watchdog, then the server. In that order, or it just comes back. |
+| `server/uninstall-service.bat` | Removes the task and stops everything for good. |
+| `server/start-server.bat` | Starts the server by hand, in a window you can watch. |
+| `server/update-yt-dlp.bat` | Run when downloads start failing. YouTube changes often. |
+
+**The watchdog** (`server/watchdog.py`) is what makes it stay up. It asks
+`/api/health` every 15 seconds and restarts the server on either kind of
+failure:
+>>>>>>> 69b39e3a1642109c7928230fe0e05911862f162f
 
 - the process **died** — seen through the child's exit code
 - the process **hung** — seen through three silent health checks in a row,
   which a plain restart-on-exit loop never catches
 
 Failed starts back off (5s → 15s → 30s → 1m → 2m → 5m) so a broken install
+<<<<<<< HEAD
 cannot spin the CPU, a lock file keeps two copies from fighting over the port,
 and an already-running server is adopted rather than duplicated. It logs to
 `data/autorun.log`, rotated at 1 MB.
@@ -177,13 +205,38 @@ from there, so emptying or re-downloading the project cannot take the running
 copy with it. Re-run `--install` after editing the server to update that copy,
 or pass `--here` to run from the project folder instead.
 
+=======
+cannot spin the CPU, a lock file keeps two watchdogs from fighting over the
+port, and an already-running server is adopted rather than duplicated. It logs
+to `server/data/watchdog.log`, rotated at 1 MB.
+
+**And something watches the watchdog.** The scheduled task carries two
+triggers: one at sign-in, and one that repeats every ten minutes forever. The
+repeating one costs nothing while the watchdog is alive — `MultipleInstances`
+is `IgnoreNew`, so the task simply declines to start a second copy — and it is
+what brings the watchdog back if the process is ever killed. The launcher waits
+on the watchdog rather than firing and forgetting, which is what keeps the task
+in the `Running` state and makes that suppression work.
+
+The task runs as you, at sign-in, with no time limit. **No administrator
+rights** — and if policy blocks task registration, the installer falls back to
+a Startup-folder shortcut on its own. Nothing shows a console window:
+`pythonw.exe` runs the watchdog, and the watchdog spawns the server with
+`CREATE_NO_WINDOW`.
+
+>>>>>>> 69b39e3a1642109c7928230fe0e05911862f162f
 Recovery times, worst case:
 
 | What died | Back up within |
 | --- | --- |
 | the server crashed or hung | ~45 seconds |
+<<<<<<< HEAD
 | autorun itself was killed | ~10 minutes |
 | the machine was restarted | sign-in, plus 15 seconds |
+=======
+| the watchdog itself was killed | ~10 minutes |
+| the machine was restarted | sign-in, plus 20 seconds |
+>>>>>>> 69b39e3a1642109c7928230fe0e05911862f162f
 
 ### 2. The extension
 
@@ -413,8 +466,12 @@ It would not help anyway. Downloads would land on GitHub's disk rather than
 yours, the extension talks to `127.0.0.1:8765`, and YouTube blocks datacenter
 addresses hard enough that `yt-dlp` fails on a runner almost immediately.
 
+<<<<<<< HEAD
 The server is meant to be local. `autorun.py` is what makes it start and stop
 with your browser.
+=======
+The server is meant to be local. The watchdog is what makes it always-on.
+>>>>>>> 69b39e3a1642109c7928230fe0e05911862f162f
 
 ### Release checks
 
@@ -437,6 +494,7 @@ releases reports `unavailable`, which is a state and not an error.
 then hard-refresh the tab (`Ctrl+Shift+R`). It logs one line on mount —
 `[Hoza YT] Download button mounted (actions)` — which tells you where it went.
 
+<<<<<<< HEAD
 **"The Hoza YT app is not running."** It should come up with your browser on
 its own. `python server/autorun.py --status` says what is running, and
 `data/autorun.log` says what happened. `python server/autorun.py --install`
@@ -444,6 +502,14 @@ sets it up again if the task was removed.
 
 **Downloads suddenly fail on YouTube.** YouTube changes often. Run
 `python server/autorun.py --update`, or `pip install -U yt-dlp`.
+=======
+**"The Hoza YT app is not running."** Run `server/install-service.bat` once so
+it comes up with Windows and stays up. `server/status.bat` says what is running,
+and `server/data/watchdog.log` says what happened.
+
+**Downloads suddenly fail on YouTube.** YouTube changes often. Run
+`server/update-yt-dlp.bat`, or `pip install -U yt-dlp`.
+>>>>>>> 69b39e3a1642109c7928230fe0e05911862f162f
 
 **A second instance on the same machine** needs its own state:
 `python server/server.py --data-dir <path>`.

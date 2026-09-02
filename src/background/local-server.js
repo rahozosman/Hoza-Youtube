@@ -22,11 +22,16 @@ const inFlight = new Map();
 const OFFLINE = {
   error: 'The Hoza YT app is not running.',
   code: 'server_offline',
+<<<<<<< HEAD
   hint: 'It starts on its own a few seconds after the browser does. Give it a moment.',
+=======
+  hint: 'Run server/install-service.bat once and it will start with Windows and stay up on its own.',
+>>>>>>> 69b39e3a1642109c7928230fe0e05911862f162f
   retryable: true,
 };
 
 /**
+<<<<<<< HEAD
  * The app is started for us when the browser opens, so the very first call of
  * a session can arrive in the second or two before it is listening. A refused
  * connection is retried across that window instead of being reported, which is
@@ -43,6 +48,13 @@ let everAnswered = false;
  * retryable } }` — never a rejection.
  */
 async function attempt(path, { method = 'GET', body = null, timeout = TIMEOUT_MS.default } = {}) {
+=======
+ * Call the local API.
+ * Returns `{ ok: true, data }` or `{ ok: false, error: { error, code, hint,
+ * retryable } }` — never a rejection.
+ */
+async function request(path, { method = 'GET', body = null, timeout = TIMEOUT_MS.default } = {}) {
+>>>>>>> 69b39e3a1642109c7928230fe0e05911862f162f
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeout);
 
@@ -76,7 +88,10 @@ async function attempt(path, { method = 'GET', body = null, timeout = TIMEOUT_MS
       };
     }
 
+<<<<<<< HEAD
     everAnswered = true;
+=======
+>>>>>>> 69b39e3a1642109c7928230fe0e05911862f162f
     return { ok: true, data };
   } catch (err) {
     // An abort is a timeout here; anything else means nothing was listening.
@@ -97,6 +112,7 @@ async function attempt(path, { method = 'GET', body = null, timeout = TIMEOUT_MS
   }
 }
 
+<<<<<<< HEAD
 /**
  * Call the local API, waiting out a cold start rather than reporting one.
  * Only a refused connection is worth retrying: a timeout, or an error the app
@@ -113,6 +129,8 @@ async function request(path, options = {}) {
   }
 }
 
+=======
+>>>>>>> 69b39e3a1642109c7928230fe0e05911862f162f
 /** Every quality this link offers, video and audio, with real figures. */
 export function analyze(url, { refresh = false } = {}) {
   const key = `${refresh ? 'fresh:' : ''}${url}`;

@@ -94,8 +94,14 @@ jobs:
             **Extension** — download the zip below, unpack it, then load the
             folder at `chrome://extensions` with Developer mode on.
 
+<<<<<<< HEAD
             **Server** — clone the repository, then
             `pip install -r server/requirements.txt` and
             `python server/server.py`. On Windows that first run sets the
             server to start with your browser and stop when you close it, so
             there is nothing else to run.
+=======
+            **Server** — clone the repository and run
+            `server/install-service.bat` once. It installs the dependencies and
+            sets the server to start with Windows and stay up on its own.
+>>>>>>> 69b39e3a1642109c7928230fe0e05911862f162f
