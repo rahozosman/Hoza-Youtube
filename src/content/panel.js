@@ -65,7 +65,7 @@
   let refs = {}; // long-lived nodes inside the panel
   let buttonHost = null;
   let button = null;
-  let placement = null; // which spot in the watch page's top row
+  let placement = null; // which spot on the page the button is in
   let hostGuard = null;
   let jobTimer = null;
   let closeTimer = null;
@@ -917,8 +917,8 @@ button img {
     '#top-row #subscribe-button',
     '#top-row #subscribe-button button',
     'ytd-reel-player-overlay-renderer #subscribe-button',
-    'ytd-subscribe-button-renderer',
-    '#subscribe-button',
+    'ytd-watch-flexy ytd-subscribe-button-renderer',
+    'ytd-watch-flexy #subscribe-button',
   ]);
 
   const findLikeActions = () => firstRendered([
@@ -927,34 +927,68 @@ button img {
     'ytd-menu-renderer#top-level-buttons-computed',
   ]);
 
+  /** The button row in YouTube's top bar, which every page has. */
+  const findTopBar = () => firstRendered([
+    'ytd-masthead #end #buttons',
+    'ytd-masthead #buttons',
+    '#masthead #end #buttons',
+    'ytd-masthead #end',
+    '#masthead #end',
+    '#masthead-container #end',
+  ]);
+
+  const isWatchPage = () => watchUrl() !== null;
+
   /**
-   * The button has one home: the watch page's top row.
+   * Where the button may sit, best spot first.
    *
-   * Four spots, all of them in that row, tried in order. The first is beside
-   * Like, Share and Save; the rest are progressively further out in the same
-   * row, and exist only because that button group is width-constrained and
-   * will clip a button it did not create.
+   * The first four are the watch page's top row: beside Like, Share and Save,
+   * then progressively further out in the same row, which exist only because
+   * that button group is width-constrained and will clip a button it did not
+   * create. They are offered on a video and nowhere else — a stray Subscribe
+   * button in a home page shelf or a channel hovercard is a spot that vanishes
+   * the moment YouTube recycles the card, which is how the button used to go
+   * missing on the home page.
+   *
+   * Every other page — home, search, channels, playlists — has the top bar,
+   * which YouTube keeps up permanently. And if even that is unavailable, the
+   * button floats clear of the page, where nothing on it can reach the button
+   * at all. One of these always holds, so no page is left without a button.
    */
   const ANCHORS = [
     {
       where: 'actions',
+      when: isWatchPage,
       find: findLikeActions,
       place: (node, at) => at.append(node),
     },
     {
       where: 'actions-inner',
+      when: isWatchPage,
       find: () => firstRendered(['ytd-watch-metadata #actions-inner', '#actions-inner']),
       place: (node, at) => at.append(node),
     },
     {
       where: 'row',
+      when: isWatchPage,
       find: () => firstRendered(['ytd-watch-metadata #top-row', '#top-row']),
       place: (node, at) => at.append(node),
     },
     {
       where: 'subscribe',
+      when: isWatchPage,
       find: findSubscribe,
       place: (node, at) => at.parentElement?.insertBefore(node, at.nextSibling),
+    },
+    {
+      where: 'masthead',
+      find: findTopBar,
+      place: (node, at) => at.prepend(node),
+    },
+    {
+      where: 'float',
+      find: () => document.body,
+      place: (node, at) => at.append(node),
     },
   ];
 
@@ -962,7 +996,7 @@ button img {
    * Laid out inline and marked `!important`, so no stylesheet on the page can
    * take the button out of the flow, shrink it away or fade it out.
    */
-  const HOST_STYLE = [
+  const HOST_BASE = [
     'display:inline-flex !important',
     'visibility:visible !important',
     'opacity:1 !important',
@@ -972,14 +1006,46 @@ button img {
     'height:auto !important',
     'max-width:none !important',
     'min-width:0',
-    'margin-left:8px !important',
-    'vertical-align:middle',
     'pointer-events:auto !important',
-    'position:static',
     'transform:none !important',
     'clip-path:none !important',
+  ];
+
+  /** In a video's action row the button comes last, after Like and Share. */
+  const HOST_STYLE = [
+    ...HOST_BASE,
+    'margin-left:8px !important',
+    'vertical-align:middle',
+    'position:static',
     'order:99',
   ].join(';');
+
+  /** In the top bar it leads the row, so its margin is on the other side. */
+  const MASTHEAD_STYLE = [
+    ...HOST_BASE,
+    'margin:0 8px 0 0 !important',
+    'vertical-align:middle',
+    'position:static',
+    'order:-1',
+  ].join(';');
+
+  /** Floating: pinned to the window, out of reach of the page's layout. */
+  const FLOAT_STYLE = [
+    ...HOST_BASE,
+    'position:fixed !important',
+    'right:24px !important',
+    'bottom:24px !important',
+    'left:auto !important',
+    'top:auto !important',
+    'margin:0 !important',
+    'z-index:2147482999 !important',
+  ].join(';');
+
+  function hostStyleFor(where) {
+    if (where === 'float') return FLOAT_STYLE;
+    if (where === 'masthead') return MASTHEAD_STYLE;
+    return HOST_STYLE;
+  }
 
   /**
    * What, if anything, is keeping the button off the screen.
@@ -994,41 +1060,55 @@ button img {
     const rect = node.getBoundingClientRect();
     if (rect.width < 8 || rect.height < 8) return 'size';
 
-    for (let parent = node.parentElement; parent && parent !== document.body;
-         parent = parent.parentElement) {
-      const style = getComputedStyle(parent);
-      if (style.display === 'none' || style.visibility === 'hidden') return parent;
-      if (style.overflowX === 'visible' && style.overflowY === 'visible') continue;
+    // The floating pill is laid out against the window, so no ancestor's
+    // overflow applies to it and the only question is whether it is on screen.
+    const fixed = getComputedStyle(node).position === 'fixed';
 
-      const box = parent.getBoundingClientRect();
-      if (!box.width && !box.height) continue;
-      const cut =
-        rect.right > box.right + 1 ||
-        rect.left < box.left - 1 ||
-        rect.bottom > box.bottom + 1 ||
-        rect.top < box.top - 1;
-      if (cut) return parent;
+    if (!fixed) {
+      for (let parent = node.parentElement; parent && parent !== document.body;
+           parent = parent.parentElement) {
+        const style = getComputedStyle(parent);
+        if (style.display === 'none' || style.visibility === 'hidden') return parent;
+        if (style.overflowX === 'visible' && style.overflowY === 'visible') continue;
+
+        const box = parent.getBoundingClientRect();
+        if (!box.width && !box.height) continue;
+        const cut =
+          rect.right > box.right + 1 ||
+          rect.left < box.left - 1 ||
+          rect.bottom > box.bottom + 1 ||
+          rect.top < box.top - 1;
+        if (cut) return parent;
+      }
     }
 
     if (rect.right > window.innerWidth + 1 || rect.left < -1) return 'viewport';
+    // Vertically, only the pinned pill can be off screen: a button in the page
+    // scrolling out of view is the page working, not the button being hidden.
+    if (fixed && (rect.bottom > window.innerHeight + 1 || rect.top < -1)) return 'viewport';
     return null;
   }
-
-  /** Elements this script has opened up, so the work is not repeated. */
-  const unclipped = new WeakSet();
 
   /**
    * Try to make the row show the button: let the clipping ancestor overflow,
    * and let the row wrap rather than cut. Returns true once nothing hides it.
+   *
+   * A region YouTube has deliberately switched off is left alone — that is the
+   * page saying the whole area is gone, and the answer to it is a different
+   * spot, not a hidden area forced back on. What is opened up is opened again
+   * whenever YouTube's own re-render wipes it, so a spot that worked once
+   * never goes permanently bad.
    */
   function makeRoom(node) {
     for (let attempt = 0; attempt < 4; attempt += 1) {
       const hider = whatHides(node);
       if (!hider) return true;
       if (!(hider instanceof Element)) return false;
-      if (unclipped.has(hider)) return false;
 
-      unclipped.add(hider);
+      const style = getComputedStyle(hider);
+      if (style.display === 'none' || style.visibility === 'hidden') return false;
+      if (hider.style.overflow === 'visible') return false; // opened, still hides
+
       hider.style.setProperty('overflow', 'visible', 'important');
       hider.style.setProperty('flex-wrap', 'wrap', 'important');
       hider.style.setProperty('max-width', 'none', 'important');
@@ -1038,9 +1118,10 @@ button img {
 
   /** Build the launcher in its own shadow root. */
   function buildLauncher(variant) {
+    const styleText = hostStyleFor(variant);
     const hostNode = document.createElement('div');
     hostNode.dataset.hozaButton = variant;
-    hostNode.style.cssText = HOST_STYLE;
+    hostNode.style.cssText = styleText;
     const root = hostNode.attachShadow({ mode: 'open' });
 
     const style = document.createElement('style');
@@ -1066,16 +1147,41 @@ button img {
     });
 
     root.append(style, control);
-    return { hostNode, control };
+    return { hostNode, control, style: styleText };
   }
 
-  function mountButton() {
-    // Already placed and visible: do not touch it. The place must stay put.
-    if (buttonHost?.isConnected && !whatHides(buttonHost)) return true;
+  /** Spots that just refused the button, so it stops hammering at them. */
+  const refused = new WeakMap();
+  const REFUSED_MS = 5000;
 
-    for (const anchor of ANCHORS) {
+  /**
+   * Put the button in the best spot this page currently offers.
+   *
+   * Called over and over, by everything below, and written to be called that
+   * way: when the button is already sitting in the best spot on offer this
+   * does nothing at all. Anything less — gone from the page, clipped out of
+   * sight, or parked in a lesser spot because the good one had not rendered
+   * yet — and the button is placed again.
+   */
+  function mountButton() {
+    const anchors = ANCHORS.filter((anchor) => !anchor.when || anchor.when());
+    const rank = placement ? anchors.findIndex((anchor) => anchor.where === placement) : -1;
+    // A spot that is not on this page's list at all — a video's action row,
+    // after navigating home — counts as no spot, however intact it looks.
+    const held = rank !== -1 && !!buttonHost?.isConnected && !whatHides(buttonHost);
+
+    for (let i = 0; i < anchors.length; i += 1) {
+      // This spot, or one below it: what the button already has is as good.
+      if (held && i >= rank) return true;
+
+      const anchor = anchors[i];
       const target = anchor.find();
       if (!target) continue;
+
+      // Only humour a spot's recent refusal while the button is up elsewhere.
+      // With nothing on screen, every spot is worth another try immediately.
+      const since = refused.get(target);
+      if (held && since != null && Date.now() - since < REFUSED_MS) continue;
 
       const built = buildLauncher(anchor.where);
       anchor.place(built.hostNode, target);
@@ -1083,42 +1189,65 @@ button img {
       // Occupying a spot is not the same as being seen in it.
       if (!makeRoom(built.hostNode)) {
         built.hostNode.remove();
+        refused.set(target, Date.now());
         continue;
       }
 
+      refused.delete(target);
       if (buttonHost !== built.hostNode) buttonHost?.remove();
       buttonHost = built.hostNode;
       button = built.control;
       placement = anchor.where;
-      guardHost();
+      guardHost(built.style);
       console.info(`[Hoza YT] button mounted (${placement})`);
       if (state.open) position();
       return true;
     }
 
-    return !!buttonHost?.isConnected && !whatHides(buttonHost);
+    return held;
+  }
+
+  const GUARD_WATCH = { attributes: true, attributeFilter: ['style', 'class', 'hidden'] };
+
+  /**
+   * YouTube rebuilds these rows as you navigate and can strip attributes from
+   * anything it finds there. If the inline layout is edited away, or the
+   * button is marked hidden, put it back.
+   *
+   * Two details keep the repair from turning on itself. The style is compared
+   * against what the browser made of it rather than the text handed in — set
+   * `a:b !important` and it reads back as `a: b !important;`, so a raw
+   * comparison never matches and the guard rewrites for ever. And the guard
+   * stops watching while it repairs, because the repair is itself an
+   * attribute change: watching that is an endless loop of observer callbacks,
+   * and since they run as microtasks it is one the page cannot get out of —
+   * scrolling, navigation and this very button all stop with it.
+   */
+  function guardHost(styleText) {
+    hostGuard?.disconnect();
+    if (!buttonHost) return;
+
+    const node = buttonHost;
+    node.style.cssText = styleText;
+    const expected = node.getAttribute('style');
+
+    const guard = new MutationObserver(() => {
+      if (!node.isConnected) return;
+      guard.disconnect();
+      if (node.hasAttribute('hidden')) node.removeAttribute('hidden');
+      if (node.getAttribute('style') !== expected) node.style.cssText = styleText;
+      guard.observe(node, GUARD_WATCH);
+    });
+    guard.observe(node, GUARD_WATCH);
+    hostGuard = guard;
   }
 
   /**
-   * YouTube rebuilds this row as you navigate and can strip attributes from
-   * anything it finds there. If the inline layout is edited away, put it back.
+   * Re-check the button: on the page, seen, and in the best spot the page
+   * offers. mountButton does nothing when all three already hold, so this is
+   * safe to call as often as anything cares to.
    */
-  function guardHost() {
-    hostGuard?.disconnect();
-    if (!buttonHost) return;
-    hostGuard = new MutationObserver(() => {
-      if (!buttonHost?.isConnected) return;
-      if (buttonHost.getAttribute('style') !== HOST_STYLE) {
-        buttonHost.style.cssText = HOST_STYLE;
-      }
-    });
-    hostGuard.observe(buttonHost, { attributes: true, attributeFilter: ['style', 'class', 'hidden'] });
-  }
-
-  /** Re-check that the button is still where it should be, and still seen. */
   function verifyPlacement() {
-    if (!watchUrl()) return;
-    if (buttonHost?.isConnected && !whatHides(buttonHost)) return;
     mountButton();
   }
 
@@ -1201,9 +1330,10 @@ button img {
   }
 
   /**
-   * Directly beneath the button, centred on it, every time. It tracks the
-   * button as the page scrolls so the two stay together, and it never flips
-   * above or relocates anywhere else.
+   * Directly beneath the button, centred on it, tracking it as the page
+   * scrolls so the two stay together. It relocates for one reason only: a
+   * button sitting low in the window — the floating pill — has no room
+   * beneath it, and there the panel opens upwards instead.
    */
   function position() {
     if (!host || !state.open) return;
@@ -1215,21 +1345,29 @@ button img {
 
     const centre = rect.left + rect.width / 2;
     const left = Math.min(Math.max(centre - width / 2, margin), window.innerWidth - width - margin);
-    const top = rect.bottom + 10;
+    const below = window.innerHeight - rect.bottom - 10 - margin;
+    const above = rect.top - 10 - margin;
+    const up = below < 240 && above > below;
 
     host.style.left = `${Math.round(left)}px`;
-    host.style.top = `${Math.round(top)}px`;
+    if (up) {
+      host.style.top = 'auto';
+      host.style.bottom = `${Math.round(window.innerHeight - rect.top + 10)}px`;
+    } else {
+      host.style.bottom = 'auto';
+      host.style.top = `${Math.round(rect.bottom + 10)}px`;
+    }
 
-    // Only as tall as the room beneath the button allows.
-    const room = window.innerHeight - top - margin;
+    // Only as tall as the room on that side of the button allows.
+    const room = up ? above : below;
     refs.panel.style.setProperty(
       '--max-height',
       `${Math.round(Math.max(240, Math.min(560, room)))}px`,
     );
 
-    // Grow from the point directly under the button.
+    // Grow from the point directly under — or over — the button.
     const originX = Math.min(Math.max(centre - left, 16), width - 16);
-    refs.panel.style.setProperty('--origin', `${Math.round(originX)}px 0%`);
+    refs.panel.style.setProperty('--origin', `${Math.round(originX)}px ${up ? '100%' : '0%'}`);
   }
 
   /* ------------------------------------------------------------ open/close */
@@ -1880,18 +2018,28 @@ button img {
   }
 
   /**
-   * A watch page assembles its owner row in stages, so one attempt is a
-   * coin toss. These retries are bounded and cheap, and stop mattering the
-   * moment the button is sitting where it belongs.
+   * A watch page assembles its owner row in stages, and the home page streams
+   * its top bar in just as late, so one attempt is a coin toss. These retries
+   * are bounded and cheap, and stop mattering the moment the button is sitting
+   * where it belongs. A new call replaces the previous ladder, so the chattier
+   * YouTube events cannot pile timers up.
    */
+  let remountTimers = [];
   function remountSoon() {
-    for (const delay of [0, 400, 1200, 2500, 5000]) setTimeout(mountButton, delay);
+    for (const timer of remountTimers) clearTimeout(timer);
+    remountTimers = [0, 250, 600, 1200, 2500, 4000, 6500, 9000]
+      .map((delay) => setTimeout(mountButton, delay));
   }
 
-  document.addEventListener('yt-navigate-finish', () => {
-    onNavigate();
-    remountSoon();
-  });
+  // YouTube announces a navigation in more than one way and not every one of
+  // them fires on every page, the home page least reliably of all. Listening
+  // to all of them costs nothing: mountButton is its own no-op.
+  for (const event of ['yt-navigate-finish', 'yt-page-data-updated', 'yt-navigate-redirect']) {
+    document.addEventListener(event, () => {
+      onNavigate();
+      remountSoon();
+    });
+  }
   window.addEventListener('popstate', onNavigate);
 
   for (const method of ['pushState', 'replaceState']) {
@@ -1923,6 +2071,19 @@ button img {
   document.addEventListener('fullscreenchange', () => {
     if (document.fullscreenElement) closePanel();
   });
+
+  // A tab in the background may have missed the page being rebuilt entirely.
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') remountSoon();
+  });
+
+  // The last line of defence. Everything above waits to be told; this simply
+  // keeps looking, so a button that goes missing for a reason nobody
+  // anticipated is back within a second and a half regardless. It costs one
+  // visibility check against a button that is almost always already fine.
+  setInterval(() => {
+    if (document.visibilityState === 'visible') verifyPlacement();
+  }, 1500);
 
   mountButton();
   remountSoon();
