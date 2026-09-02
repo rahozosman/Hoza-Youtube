@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Settings — Hoza YT</title>
+    <link rel="stylesheet" href="../shared/tokens.css" />
+    <link rel="stylesheet" href="../shared/components.css" />
+    <link rel="stylesheet" href="options.css" />
+  </head>
+  <body>
+    <div class="shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <div>
+            <h1>Hoza YT</h1>
+            <p class="faint" id="version">Settings</p>
+          </div>
+        </div>
+
+        <nav class="nav" role="tablist">
+          <button class="nav-item" type="button" role="tab" data-section="general" aria-selected="true">General</button>
+          <button class="nav-item" type="button" role="tab" data-section="downloads" aria-selected="false">Downloads</button>
+          <button class="nav-item" type="button" role="tab" data-section="appearance" aria-selected="false">Appearance</button>
+          <button class="nav-item" type="button" role="tab" data-section="detection" aria-selected="false">Detection</button>
+          <button class="nav-item" type="button" role="tab" data-section="privacy" aria-selected="false">Privacy</button>
+          <button class="nav-item" type="button" role="tab" data-section="advanced" aria-selected="false">Advanced</button>
+          <button class="nav-item" type="button" role="tab" data-section="about" aria-selected="false">About</button>
+        </nav>
+
+        <div class="sidebar-foot">
+          <button id="open-manager" class="btn btn-sm btn-ghost" type="button">Open downloads</button>
+        </div>
+      </aside>
+
+      <main class="content">
+        <div id="sections"></div>
+        <div id="toast-slot" class="toast-slot"></div>
+      </main>
+    </div>
+
+    <script type="module" src="options.js"></script>
+  </body>
+</html>

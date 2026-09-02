@@ -1,0 +1,105 @@
+name: yt-dlp watch
+
+# YouTube changes what it serves every few weeks and yt-dlp chases it. When
+# downloads suddenly start failing, an out-of-date yt-dlp is nearly always the
+# reason. This checks PyPI once a week and opens an issue when the pinned floor
+# has fallen behind, so the fix is waiting rather than being discovered during
+# a failed download.
+
+on:
+  schedule:
+    # Mondays, 06:00 UTC.
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    name: Compare against PyPI
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Look up the latest yt-dlp
+        id: check
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import re
+          import urllib.request
+          from pathlib import Path
+
+          requirements = Path("server/requirements.txt").read_text(encoding="utf-8")
+          match = re.search(r"^yt-dlp>=(.+)$", requirements, re.MULTILINE)
+          pinned = match.group(1).strip() if match else "unknown"
+
+          with urllib.request.urlopen("https://pypi.org/pypi/yt-dlp/json", timeout=30) as response:
+              latest = json.load(response)["info"]["version"]
+
+          def parts(version: str):
+              return tuple(int(p) for p in re.findall(r"\d+", version))
+
+          behind = pinned != "unknown" and parts(latest) > parts(pinned)
+
+          print(f"pinned floor : {pinned}")
+          print(f"latest onPyPI: {latest}")
+          print(f"behind       : {behind}")
+
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as out:
+              out.write(f"pinned={pinned}\n")
+              out.write(f"latest={latest}\n")
+              out.write(f"behind={str(behind).lower()}\n")
+          PY
+
+      - name: Open or update the issue
+        if: steps.check.outputs.behind == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PINNED: ${{ steps.check.outputs.pinned }}
+          LATEST: ${{ steps.check.outputs.latest }}
+        run: |
+          title="yt-dlp $LATEST is out (pinned floor is $PINNED)"
+
+          # The label has to exist before an issue can carry it, and it will not
+          # on a fresh repository.
+          gh label create yt-dlp --color BFD4F2 \
+            --description "yt-dlp version tracking" 2>/dev/null || true
+
+          # One rolling issue rather than a new one every week.
+          existing=$(gh issue list --state open --label yt-dlp --limit 1 --json number --jq '.[0].number')
+
+          body=$(cat <<EOF
+          PyPI now has **yt-dlp $LATEST**. \`server/requirements.txt\` pins \`yt-dlp>=$PINNED\`.
+
+          On any machine already running the server:
+
+          \`\`\`
+          server/update-yt-dlp.bat
+          \`\`\`
+
+          To raise the floor in the repository, edit \`server/requirements.txt\`:
+
+          \`\`\`
+          yt-dlp>=$LATEST
+          \`\`\`
+
+          _Raised automatically by the \`yt-dlp watch\` workflow._
+          EOF
+          )
+
+          if [ -n "$existing" ]; then
+            gh issue edit "$existing" --title "$title" --body "$body"
+            echo "Updated issue #$existing"
+          else
+            gh issue create --title "$title" --body "$body" --label yt-dlp
+            echo "Opened a new issue"
+          fi

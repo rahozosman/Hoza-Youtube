@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HOZA Download</title>
+<style>
+  :root {
+    --bg: #0f1115; --panel: #171a21; --panel-2: #1e222b; --line: #2a2f3a;
+    --text: #e8eaf0; --muted: #8b93a7; --accent: #ff3d57; --accent-2: #ff6b7a;
+    --ok: #38c97a; --warn: #f5b942; --err: #ff5a5a; --radius: 14px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--text);
+    font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  a { color: var(--accent-2); }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 28px 18px 60px; }
+  header { display: flex; align-items: center; gap: 12px; margin-bottom: 22px; }
+  .logo { width: 40px; height: 40px; border-radius: 12px; background: linear-gradient(135deg, var(--accent), #ff8a5b);
+    display: grid; place-items: center; font-weight: 800; color: #fff; }
+  h1 { font-size: 20px; margin: 0; }
+  .sub { color: var(--muted); font-size: 13px; }
+  .status { margin-left: auto; font-size: 12px; color: var(--muted); display: flex; gap: 10px; align-items: center; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); display: inline-block; }
+  .dot.off { background: var(--err); }
+
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; margin-bottom: 16px; }
+  .row { display: flex; gap: 10px; align-items: center; }
+  input[type=text] { flex: 1; min-width: 0; background: var(--panel-2); border: 1px solid var(--line); color: var(--text);
+    padding: 12px 14px; border-radius: 10px; font-size: 15px; outline: none; }
+  input[type=text]:focus { border-color: var(--accent); }
+  button { background: var(--accent); color: #fff; border: 0; padding: 12px 18px; border-radius: 10px; font-weight: 600;
+    font-size: 14px; cursor: pointer; white-space: nowrap; }
+  button:hover { background: var(--accent-2); }
+  button:disabled { opacity: .5; cursor: default; }
+  button.ghost { background: var(--panel-2); color: var(--text); border: 1px solid var(--line); }
+  button.ghost:hover { border-color: var(--muted); background: var(--panel-2); }
+  button.small { padding: 7px 12px; font-size: 13px; }
+  .hint { color: var(--muted); font-size: 13px; margin-top: 8px; min-height: 18px; }
+  .hint.err { color: var(--err); }
+  .hint.ok { color: var(--ok); }
+
+  .video { display: grid; grid-template-columns: 220px 1fr; gap: 16px; }
+  .thumb { width: 100%; aspect-ratio: 16/9; object-fit: cover; border-radius: 10px; background: #000; }
+  .title { font-weight: 700; font-size: 17px; margin: 0 0 4px; }
+  .meta { color: var(--muted); font-size: 13px; }
+
+  .qualities { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; margin-top: 14px; }
+  .q { background: var(--panel-2); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; cursor: pointer;
+    display: flex; flex-direction: column; gap: 2px; transition: border-color .15s, transform .1s; }
+  .q:hover { border-color: var(--accent); transform: translateY(-1px); }
+  .q .l { font-weight: 700; font-size: 15px; }
+  .q .d { color: var(--muted); font-size: 12px; }
+  .q .s { color: var(--text); font-size: 12px; opacity: .8; }
+  .q.audio { border-style: dashed; }
+
+  .jobs { display: flex; flex-direction: column; gap: 10px; }
+  .job { background: var(--panel-2); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+  .job .top { display: flex; gap: 10px; align-items: center; }
+  .job .name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+  .badge { font-size: 11px; padding: 3px 8px; border-radius: 999px; background: var(--line); color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+  .badge.downloading { background: rgba(255,61,87,.18); color: var(--accent-2); }
+  .badge.merging { background: rgba(245,185,66,.18); color: var(--warn); }
+  .badge.done { background: rgba(56,201,122,.18); color: var(--ok); }
+  .badge.error, .badge.cancelled { background: rgba(255,90,90,.18); color: var(--err); }
+  .bar { height: 6px; background: var(--line); border-radius: 999px; overflow: hidden; margin-top: 10px; }
+  .bar > i { display: block; height: 100%; background: linear-gradient(90deg, var(--accent), #ff8a5b); width: 0; transition: width .4s; }
+  .bar.merging > i { background: var(--warn); animation: pulse 1s infinite alternate; }
+  .bar.done > i { background: var(--ok); }
+  @keyframes pulse { from { opacity: .5; } to { opacity: 1; } }
+  .job .info { display: flex; gap: 14px; color: var(--muted); font-size: 12px; margin-top: 6px; flex-wrap: wrap; }
+  .job .err { color: var(--err); font-size: 12px; margin-top: 6px; word-break: break-word; }
+
+  .settings .row + .row { margin-top: 10px; }
+  label { color: var(--muted); font-size: 13px; display: block; margin-bottom: 6px; }
+  code { background: var(--panel-2); padding: 2px 6px; border-radius: 6px; font-size: 12px; }
+  .empty { color: var(--muted); font-size: 13px; text-align: center; padding: 14px; }
+  .sect { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .sect h2 { font-size: 14px; margin: 0; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+  @media (max-width: 600px) { .video { grid-template-columns: 1fr; } .row.wrap { flex-wrap: wrap; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">L</div>
+    <div>
+      <h1>HOZA Download</h1>
+        <div class="sub">Paste a YouTube or Zoom link, pick a quality, download to your folder.</div>
+    </div>
+    <div class="status" id="status"><span class="dot off"></span> connecting</div>
+  </header>
+
+  <div class="card">
+    <div class="row">
+      <input type="text" id="url" placeholder="YouTube or Zoom recording link" autofocus>
+      <button id="detect">Detect</button>
+    </div>
+    <div class="hint" id="hint">Tip: pasting a link detects it automatically.</div>
+  </div>
+
+  <div class="card" id="result" hidden>
+    <div class="video">
+      <img class="thumb" id="thumb" alt="">
+      <div>
+        <p class="title" id="vtitle"></p>
+        <div class="meta" id="vmeta"></div>
+        <div class="hint" id="qhint"></div>
+      </div>
+    </div>
+    <div class="qualities" id="qualities"></div>
+  </div>
+
+  <div class="card">
+    <div class="sect">
+      <h2>Downloads</h2>
+      <div class="row">
+        <button class="ghost small" id="openFolder">Open folder</button>
+        <button class="ghost small" id="clear">Clear finished</button>
+      </div>
+    </div>
+    <div class="jobs" id="jobs"><div class="empty">Nothing downloading yet.</div></div>
+  </div>
+
+  <div class="card settings">
+    <div class="sect"><h2>Save location</h2></div>
+    <div class="row wrap">
+      <input type="text" id="dir" placeholder="C:\Users\you\Downloads\YouTube">
+      <button class="ghost" id="browse">Browse...</button>
+      <button id="saveDir">Save path</button>
+    </div>
+    <div class="row" style="margin-top:12px">
+      <div style="flex:1">
+        <label>Filename template</label>
+        <input type="text" id="tpl" style="width:100%">
+      </div>
+    </div>
+    <div class="hint">Tokens: <code>%(title)s</code> <code>%(height)s</code> <code>%(uploader)s</code> <code>%(id)s</code> <code>%(upload_date)s</code> <code>%(ext)s</code> (ext is required)</div>
+    <div class="hint" id="dirHint"></div>
+  </div>
+</div>
+
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const api = async (path, body) => {
+    const res = await fetch('/api/' + path, body === undefined
+      ? {} : { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || ('HTTP ' + res.status));
+    return data;
+  };
+
+  let currentInfo = null;
+  let lastProbed = '';
+
+  function setHint(msg, cls) { const h = $('hint'); h.textContent = msg || ''; h.className = 'hint ' + (cls || ''); }
+
+  async function loadStatus() {
+    try {
+      const s = await api('status');
+      $('status').innerHTML = `<span class="dot"></span> yt-dlp ${s.yt_dlp} &middot; ffmpeg ${s.ffmpeg ? 'ready' : 'missing'}`;
+    } catch { $('status').innerHTML = '<span class="dot off"></span> server offline'; }
+  }
+
+  async function loadSettings() {
+    try {
+      const s = await api('settings');
+      $('dir').value = s.download_dir;
+      $('tpl').value = s.filename_template;
+    } catch {}
+  }
+
+  async function detect() {
+    const url = $('url').value.trim();
+    if (!url) { setHint('Paste a YouTube or Zoom link first.', 'err'); return; }
+    const d = await api('detect', { url });
+    if (!d.supported) { setHint('That is not a supported YouTube or Zoom video link.', 'err'); return; }
+    if (d.source === 'youtube' && d.kind === 'playlist') { setHint('Playlist links are not supported yet. Paste a single video.', 'err'); return; }
+    if (!d.id) { setHint('No supported video was found in that link.', 'err'); return; }
+    if (lastProbed === d.id && currentInfo) return;
+    setHint(`${d.source === 'zoom' ? 'Zoom' : 'YouTube'} video detected. Fetching qualities...`, 'ok');
+    $('detect').disabled = true;
+    try {
+      const info = await api('info', { url });
+      currentInfo = info; lastProbed = d.id;
+      render(info);
+      setHint('Choose a quality to start the download.', 'ok');
+    } catch (e) {
+      setHint(e.message, 'err');
+      $('result').hidden = true;
+    } finally { $('detect').disabled = false; }
+  }
+
+  function fmtViews(n) { return n ? n.toLocaleString() + ' views' : ''; }
+
+  function render(info) {
+    $('result').hidden = false;
+    $('thumb').src = info.thumbnail || '';
+    $('vtitle').textContent = info.title || '';
+    $('vmeta').textContent = [info.uploader, info.duration_string, fmtViews(info.view_count)].filter(Boolean).join(' \u00b7 ');
+    $('qhint').textContent = info.ffmpeg ? '' : 'ffmpeg not found: only qualities that already include audio are listed.';
+    const box = $('qualities'); box.innerHTML = '';
+    for (const q of info.qualities) {
+      const el = document.createElement('div');
+      el.className = 'q' + (q.kind === 'audio' ? ' audio' : '');
+      el.innerHTML = `<span class="l"></span><span class="d"></span><span class="s"></span>`;
+      el.querySelector('.l').textContent = q.label;
+      el.querySelector('.d').textContent = q.detail;
+      el.querySelector('.s').textContent = q.size ? '~' + q.size : '';
+      el.onclick = () => startDownload(q);
+      box.appendChild(el);
+    }
+  }
+
+  async function startDownload(q) {
+    try {
+      await api('download', { url: currentInfo.webpage_url, quality: q });
+      setHint(`Downloading "${currentInfo.title}" at ${q.label}.`, 'ok');
+      pollJobs();
+    } catch (e) { setHint(e.message, 'err'); }
+  }
+
+  function jobRow(j) {
+    const el = document.createElement('div'); el.className = 'job';
+    const name = j.filename || j.title || j.url;
+    const status = j.status;
+    const pct = status === 'done' ? 100 : j.progress;
+    const parts = [];
+    if (j.quality) parts.push(j.quality);
+    if (status === 'downloading') {
+      if (j.downloaded && j.total) parts.push(`${j.downloaded} / ${j.total}`);
+      if (j.speed) parts.push(j.speed);
+      if (j.eta != null) parts.push(`ETA ${j.eta}s`);
+    } else if (status === 'merging') parts.push('merging video + audio');
+    else if (status === 'done' && j.filepath) parts.push(j.filepath);
+    el.innerHTML = `
+      <div class="top">
+        <span class="name"></span>
+        <span class="badge ${status}">${status}</span>
+        ${status === 'downloading' || status === 'queued' ? `<button class="ghost small" data-act="cancel">Cancel</button>` : ''}
+        ${status === 'done' ? `<button class="ghost small" data-act="reveal">Show file</button>` : ''}
+        ${['done','error','cancelled'].includes(status) ? `<button class="ghost small" data-act="remove">&times;</button>` : ''}
+      </div>
+      <div class="bar ${status}"><i style="width:${pct}%"></i></div>
+      <div class="info">${parts.map(p => `<span></span>`).join('')}</div>
+      ${j.error && status !== 'cancelled' ? `<div class="err"></div>` : ''}`;
+    el.querySelector('.name').textContent = name;
+    el.querySelectorAll('.info span').forEach((s, i) => s.textContent = parts[i]);
+    if (j.error && status !== 'cancelled') el.querySelector('.err').textContent = j.error;
+    el.querySelectorAll('button[data-act]').forEach(b => b.onclick = async () => {
+      await api(b.dataset.act, { id: j.id }).catch(e => setHint(e.message, 'err'));
+      pollJobs();
+    });
+    return el;
+  }
+
+  let pollTimer = null;
+  async function pollJobs() {
+    clearTimeout(pollTimer);
+    let jobs = [];
+    try { jobs = (await api('jobs')).jobs; } catch {}
+    const box = $('jobs'); box.innerHTML = '';
+    if (!jobs.length) box.innerHTML = '<div class="empty">Nothing downloading yet.</div>';
+    for (const j of jobs) box.appendChild(jobRow(j));
+    const active = jobs.some(j => ['queued', 'downloading', 'merging'].includes(j.status));
+    pollTimer = setTimeout(pollJobs, active ? 700 : 4000);
+  }
+
+  // Events
+  $('detect').onclick = detect;
+  $('url').addEventListener('keydown', e => { if (e.key === 'Enter') detect(); });
+  $('url').addEventListener('paste', () => setTimeout(detect, 50));
+  $('openFolder').onclick = () => api('open-folder', {}).catch(e => setHint(e.message, 'err'));
+  $('clear').onclick = () => api('clear', {}).then(pollJobs);
+  $('saveDir').onclick = async () => {
+    const h = $('dirHint');
+    try {
+      const s = await api('settings', { download_dir: $('dir').value, filename_template: $('tpl').value });
+      $('dir').value = s.download_dir; $('tpl').value = s.filename_template;
+      h.textContent = 'Saved. New downloads go to ' + s.download_dir; h.className = 'hint ok';
+    } catch (e) { h.textContent = e.message; h.className = 'hint err'; }
+  };
+  $('browse').onclick = async () => {
+    $('browse').disabled = true;
+    try {
+      const r = await api('pick-folder', {});
+      if (r.download_dir) { $('dir').value = r.download_dir; $('saveDir').click(); }
+    } finally { $('browse').disabled = false; }
+  };
+
+  // Support ?url=... so a bookmarklet or the extension can hand a link over.
+  const qp = new URLSearchParams(location.search).get('url');
+  if (qp) { $('url').value = qp; history.replaceState(null, '', '/'); setTimeout(detect, 100); }
+
+  loadStatus(); loadSettings(); pollJobs();
+})();
+</script>
+</body>
+</html>

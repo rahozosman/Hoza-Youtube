@@ -1,0 +1,679 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hoza YT</title>
+<link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <span class="brand-mark">H</span>
+      <span class="brand-text">
+        <span class="brand-name">Hoza YT</span>
+        <span class="brand-sub" id="brand-version">version</span>
+      </span>
+    </div>
+
+    <nav class="nav" id="nav">
+      <div class="nav-label">Main</div>
+      <button class="nav-item active" data-view="dashboard">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+        Dashboard
+      </button>
+      <button class="nav-item" data-view="download">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download
+      </button>
+      <button class="nav-item" data-view="video">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+        Video
+      </button>
+      <button class="nav-item" data-view="audio">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+        Audio
+      </button>
+
+      <div class="nav-label">Activity</div>
+      <button class="nav-item" data-view="queue">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        Queue <span class="count" id="nav-queue-count"></span>
+      </button>
+      <button class="nav-item" data-view="history">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/></svg>
+        History
+      </button>
+
+      <div class="nav-label">System</div>
+      <button class="nav-item" data-view="servers">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+        Servers <span class="count" id="nav-server-count"></span>
+      </button>
+      <button class="nav-item" data-view="settings">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Settings
+      </button>
+      <button class="nav-item" data-view="diagnostics">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        Diagnostics
+      </button>
+      <button class="nav-item" data-view="logs">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Logs
+      </button>
+      <button class="nav-item" data-view="about">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        About
+      </button>
+    </nav>
+
+    <div class="sidebar-foot">
+      <div class="row" style="justify-content:space-between">
+        <span class="pill" id="backend-pill"><span class="dot"></span> Connecting</span>
+        <button class="btn ghost icon" id="theme-btn" title="Switch theme" aria-label="Switch theme">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <div class="scrim" id="scrim" hidden></div>
+
+  <div class="main">
+    <header class="topbar">
+      <button class="btn ghost icon menu-btn" id="menu-btn" aria-label="Open menu">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <div>
+        <h1 id="page-title">Dashboard</h1>
+        <p class="sub" id="page-sub">Overview of downloads, servers and storage</p>
+      </div>
+      <div class="topbar-actions">
+        <span class="pill" id="ext-pill" title="Browser extension status"><span class="dot"></span> Extension</span>
+        <button class="btn ghost icon" id="refresh-btn" title="Refresh" aria-label="Refresh">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- ============================================================ DASHBOARD -->
+    <section class="view active" id="view-dashboard">
+      <div class="card hero">
+        <div class="card-head">
+          <h2>Download something</h2>
+        </div>
+        <div class="row wrap">
+          <input type="text" id="url-input" placeholder="Paste a media URL" autocomplete="off" spellcheck="false">
+          <button class="btn" id="analyze-btn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            Analyze
+          </button>
+          <button class="btn ghost" id="paste-btn">Paste &amp; Analyze</button>
+        </div>
+        <p class="help muted" id="url-help" style="margin:9px 0 0;font-size:12.5px">
+          Any source the extractor supports. The list of qualities comes from the source itself.
+        </p>
+      </div>
+
+      <div class="grid four" style="margin-bottom:18px">
+        <div class="tile accent"><div class="k">Active</div><div class="v" id="stat-active">0</div><div class="n" id="stat-speed">idle</div></div>
+        <div class="tile"><div class="k">Queued</div><div class="v" id="stat-queued">0</div><div class="n">waiting for a slot</div></div>
+        <div class="tile"><div class="k">Completed</div><div class="v" id="stat-completed">0</div><div class="n" id="stat-bytes">no downloads yet</div></div>
+        <div class="tile"><div class="k">Failed</div><div class="v" id="stat-failed">0</div><div class="n">see Queue for details</div></div>
+      </div>
+
+      <div class="grid two">
+        <div class="card">
+          <div class="card-head"><h2>Quick actions</h2></div>
+          <div class="grid two" style="gap:9px">
+            <button class="btn ghost" data-goto="download">Download</button>
+            <button class="btn ghost" data-goto="audio">Audio</button>
+            <button class="btn ghost" data-goto="video">Video</button>
+            <button class="btn ghost" data-goto="queue">Queue</button>
+            <button class="btn ghost" data-goto="history">History</button>
+            <button class="btn ghost" data-goto="settings">Settings</button>
+            <button class="btn ghost" id="open-folder-btn">Open folder</button>
+            <button class="btn ghost" data-goto="servers">Server status</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <h2>Storage &amp; system</h2>
+            <span class="spacer"></span>
+          </div>
+          <dl class="kv" id="system-kv">
+            <dt>Loading</dt><dd class="muted">reading system information</dd>
+          </dl>
+        </div>
+      </div>
+
+      <div class="card flush">
+        <div class="card-head" style="padding:18px 20px 0;margin-bottom:12px">
+          <h2>Recent activity</h2>
+          <span class="spacer"></span>
+          <button class="btn ghost sm" data-goto="queue">Open queue</button>
+        </div>
+        <div class="stack" id="recent-jobs" style="padding:0 20px 20px"></div>
+      </div>
+    </section>
+
+    <!-- ============================================================= DOWNLOAD -->
+    <section class="view" id="view-download">
+      <div class="card">
+        <div class="row wrap">
+          <input type="text" id="url-input-2" placeholder="Paste a media URL" autocomplete="off" spellcheck="false">
+          <button class="btn" id="analyze-btn-2">Analyze</button>
+          <button class="btn ghost" id="reanalyze-btn" title="Ignore the cached result">Refresh</button>
+        </div>
+        <div id="analyze-state" style="margin-top:12px"></div>
+      </div>
+
+      <div id="media-panel" hidden>
+        <div class="card">
+          <div class="media">
+            <div>
+              <img class="media-thumb" id="m-thumb" alt="">
+              <div class="row" style="margin-top:11px;gap:7px">
+                <button class="btn ghost sm block" id="m-open-source">Open source page</button>
+              </div>
+            </div>
+            <div>
+              <h3 id="m-title"></h3>
+              <div class="media-meta" id="m-meta"></div>
+              <p class="media-desc" id="m-desc"></p>
+              <dl class="kv" id="m-facts" style="margin-top:14px"></dl>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <h2>Smart quality</h2>
+            <span class="spacer"></span>
+            <div class="seg" id="kind-seg">
+              <button data-kind="video" class="active">Video</button>
+              <button data-kind="audio">Audio</button>
+            </div>
+          </div>
+          <div class="opts" id="preset-opts"></div>
+          <p class="help muted" style="margin-top:11px;font-size:12px">
+            Presets resolve to the exact streams shown. Nothing is substituted at download time.
+          </p>
+        </div>
+
+        <div class="card" id="custom-card">
+          <div class="card-head">
+            <h2 id="custom-title">Custom quality</h2>
+            <span class="spacer"></span>
+            <span class="pill" id="custom-count"></span>
+          </div>
+          <div class="opts" id="quality-opts"></div>
+        </div>
+
+        <div class="card" id="subs-card" hidden>
+          <div class="card-head"><h2>Subtitles</h2></div>
+          <div class="grid two">
+            <div class="field">
+              <label for="sub-mode">What to do with subtitles</label>
+              <select id="sub-mode">
+                <option value="off">Do not download</option>
+                <option value="download">Save as a separate file</option>
+                <option value="embed">Embed into the video</option>
+                <option value="both">Both</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="sub-lang">Track</label>
+              <select id="sub-lang"></select>
+            </div>
+          </div>
+          <div id="sub-list" class="row wrap" style="gap:6px"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h2>Start download</h2></div>
+          <div id="selection-summary" class="muted" style="margin-bottom:13px;font-size:13px">
+            Choose a quality above.
+          </div>
+          <div class="row wrap">
+            <button class="btn" id="start-btn" disabled>Add to queue</button>
+            <button class="btn ghost" data-goto="queue">Open queue</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================ VIDEO -->
+    <section class="view" id="view-video">
+      <div class="card">
+        <div class="card-head">
+          <h2>Video output</h2>
+          <p>Applied to every video download. Only formats this machine can write are listed.</p>
+        </div>
+        <div class="grid three">
+          <div class="field">
+            <label for="v-container">Container</label>
+            <select id="v-container" data-cfg="video.container"></select>
+          </div>
+          <div class="field">
+            <label for="v-codec">Preferred codec</label>
+            <select id="v-codec" data-cfg="video.preferred_codec"></select>
+            <span class="help">Used when a resolution offers more than one codec.</span>
+          </div>
+          <div class="field">
+            <label for="v-res">Default resolution</label>
+            <select id="v-res" data-cfg="video.default_resolution"></select>
+          </div>
+          <div class="field">
+            <label for="v-fps">Frame rate</label>
+            <select id="v-fps" data-cfg="video.fps_mode"></select>
+            <span class="help">Changing frame rate needs re-encoding, which is not offered.</span>
+          </div>
+          <div class="field">
+            <label>HDR</label>
+            <label class="switch">
+              <input type="checkbox" id="v-hdr" data-cfg="video.prefer_hdr">
+              <span class="track"></span>
+              <span class="switch-text">Prefer HDR when the source has it</span>
+            </label>
+            <span class="help">HDR is preserved as delivered. Converting HDR to SDR is not offered.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h2>Video streams</h2>
+          <span class="spacer"></span>
+          <span class="pill" id="video-src-pill">No analysis yet</span>
+        </div>
+        <div id="video-streams"></div>
+      </div>
+    </section>
+
+    <!-- ================================================================ AUDIO -->
+    <section class="view" id="view-audio">
+      <div class="card">
+        <div class="card-head">
+          <h2>Audio output</h2>
+          <p>Only formats the installed ffmpeg can actually produce are listed.</p>
+        </div>
+        <div class="grid three">
+          <div class="field">
+            <label for="a-format">Output format</label>
+            <select id="a-format" data-cfg="audio.format"></select>
+          </div>
+          <div class="field">
+            <label for="a-bitrate">Bitrate</label>
+            <select id="a-bitrate" data-cfg="audio.bitrate"></select>
+            <span class="help" id="a-bitrate-help"></span>
+          </div>
+          <div class="field">
+            <label for="a-rate">Sample rate</label>
+            <select id="a-rate" data-cfg="audio.sample_rate"></select>
+          </div>
+          <div class="field">
+            <label for="a-channels">Channels</label>
+            <select id="a-channels" data-cfg="audio.channels"></select>
+          </div>
+          <div class="field">
+            <label>Loudness</label>
+            <label class="switch">
+              <input type="checkbox" id="a-normalize" data-cfg="audio.normalize">
+              <span class="track"></span>
+              <span class="switch-text">Normalize audio</span>
+            </label>
+            <span class="help">Applies EBU R128 loudness normalisation.</span>
+          </div>
+          <div class="field">
+            <label>Source</label>
+            <label class="switch">
+              <input type="checkbox" id="a-original" data-cfg="audio.prefer_original">
+              <span class="track"></span>
+              <span class="switch-text">Preserve original when it matches</span>
+            </label>
+            <span class="help">Skips conversion when the source is already the chosen format.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h2>Audio streams</h2>
+          <span class="spacer"></span>
+          <span class="pill" id="audio-src-pill">No analysis yet</span>
+        </div>
+        <div id="audio-streams"></div>
+      </div>
+    </section>
+
+    <!-- ================================================================ QUEUE -->
+    <section class="view" id="view-queue">
+      <div class="card">
+        <div class="card-head">
+          <h2>Queue</h2>
+          <span class="spacer"></span>
+          <button class="btn ghost sm" id="pause-all-btn">Pause all</button>
+          <button class="btn ghost sm" id="resume-all-btn">Resume all</button>
+          <button class="btn ghost sm" id="clear-jobs-btn">Clear finished</button>
+        </div>
+        <div class="row wrap" style="margin-bottom:14px">
+          <div class="seg" id="queue-filter">
+            <button data-filter="all" class="active">All</button>
+            <button data-filter="active">Active</button>
+            <button data-filter="completed">Completed</button>
+            <button data-filter="failed">Failed</button>
+          </div>
+        </div>
+        <div class="stack" id="job-list"></div>
+      </div>
+    </section>
+
+    <!-- ============================================================== HISTORY -->
+    <section class="view" id="view-history">
+      <div class="card">
+        <div class="card-head">
+          <h2>History</h2>
+          <span class="spacer"></span>
+          <button class="btn ghost sm" id="clear-history-btn">Clear history</button>
+        </div>
+        <div class="row wrap" style="margin-bottom:14px">
+          <input type="search" id="hist-search" placeholder="Search by title" style="max-width:250px">
+          <select id="hist-kind" style="max-width:140px">
+            <option value="">All types</option>
+            <option value="video">Video</option>
+            <option value="audio">Audio</option>
+          </select>
+          <select id="hist-status" style="max-width:150px">
+            <option value="">All results</option>
+            <option value="completed">Completed</option>
+            <option value="failed">Failed</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+          <select id="hist-sort" style="max-width:150px">
+            <option value="newest">Newest first</option>
+            <option value="oldest">Oldest first</option>
+            <option value="largest">Largest</option>
+            <option value="smallest">Smallest</option>
+            <option value="name">Name</option>
+          </select>
+        </div>
+        <div class="grid four" style="margin-bottom:14px">
+          <div class="tile"><div class="k">Records</div><div class="v sm" id="h-total">0</div></div>
+          <div class="tile"><div class="k">Completed</div><div class="v sm" id="h-completed">0</div></div>
+          <div class="tile"><div class="k">Failed</div><div class="v sm" id="h-failed">0</div></div>
+          <div class="tile"><div class="k">Total size</div><div class="v sm" id="h-bytes">0</div></div>
+        </div>
+        <div class="table-wrap">
+          <table class="table">
+            <thead><tr><th>Title</th><th>Type</th><th>Quality</th><th>Size</th><th>Status</th><th>When</th><th></th></tr></thead>
+            <tbody id="history-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================== SERVERS -->
+    <section class="view" id="view-servers">
+      <div class="card">
+        <div class="card-head">
+          <h2>Backend servers</h2>
+          <span class="spacer"></span>
+          <button class="btn ghost sm" id="check-servers-btn">Run health check</button>
+        </div>
+        <p class="muted" style="margin:0 0 14px;font-size:12.5px">
+          This machine is always registered. Add another instance of this application to share
+          work across machines. Every status below comes from a real health request.
+        </p>
+        <div class="stack" id="server-list"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>Add a server</h2></div>
+        <div class="grid three">
+          <div class="field"><label for="srv-name">Name</label><input type="text" id="srv-name" placeholder="server-2"></div>
+          <div class="field"><label for="srv-url">Address</label><input type="text" id="srv-url" placeholder="http://192.168.1.20:8765"></div>
+          <div class="field">
+            <label for="srv-role">Role</label>
+            <select id="srv-role">
+              <option value="api+worker">API and worker</option>
+              <option value="worker">Worker only</option>
+              <option value="api">API only</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn" id="add-server-btn">Add server</button>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>Failover</h2></div>
+        <div class="stack">
+          <label class="switch">
+            <input type="checkbox" id="failover-toggle" data-cfg="network.failover_enabled">
+            <span class="track"></span>
+            <span class="switch-text">Route jobs away from an unhealthy server automatically</span>
+          </label>
+          <label class="switch">
+            <input type="checkbox" id="dispatch-toggle" data-cfg="advanced.allow_remote_dispatch">
+            <span class="track"></span>
+            <span class="switch-text">Allow jobs to run on remote servers</span>
+          </label>
+        </div>
+        <div class="grid three" style="margin-top:14px">
+          <div class="field"><label for="n-interval">Health check interval (seconds)</label><input type="number" id="n-interval" data-cfg="network.health_interval" min="5" max="600"></div>
+          <div class="field"><label for="n-timeout">Request timeout (seconds)</label><input type="number" id="n-timeout" data-cfg="network.request_timeout" min="3" max="120"></div>
+          <div class="field"><label for="n-retry">Retry delay (seconds)</label><input type="number" id="n-retry" data-cfg="network.retry_delay" min="0" max="60"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================= SETTINGS -->
+    <section class="view" id="view-settings">
+      <div class="card">
+        <div class="card-head">
+          <h2>General</h2>
+          <span class="spacer"></span>
+          <span class="pill" id="save-state">Saved automatically</span>
+        </div>
+        <div class="field">
+          <label for="s-dir">Download folder</label>
+          <div class="row wrap">
+            <input type="text" id="s-dir" data-cfg="general.download_dir">
+            <button class="btn ghost" id="browse-btn">Browse</button>
+            <button class="btn ghost" id="open-folder-btn-2">Open</button>
+          </div>
+        </div>
+        <div class="grid three">
+          <div class="field"><label for="s-type">Default media type</label><select id="s-type" data-cfg="general.default_media_type"><option value="video">Video</option><option value="audio">Audio</option></select></div>
+          <div class="field"><label for="s-quality">Default quality</label><select id="s-quality" data-cfg="general.default_quality"></select></div>
+          <div class="field"><label for="s-preset">Default preset</label><select id="s-preset" data-cfg="general.default_preset"></select></div>
+        </div>
+        <div class="stack">
+          <label class="switch"><input type="checkbox" id="s-autoanalyze" data-cfg="general.auto_analyze"><span class="track"></span><span class="switch-text">Analyze automatically when a link is pasted</span></label>
+          <label class="switch"><input type="checkbox" id="s-autodl" data-cfg="general.auto_download"><span class="track"></span><span class="switch-text">Start the default quality immediately after analysis</span></label>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>Filenames</h2></div>
+        <div class="field">
+          <label for="s-template">Template</label>
+          <input type="text" id="s-template" data-cfg="filename.template">
+          <span class="help" id="template-tokens"></span>
+        </div>
+        <div class="grid three">
+          <div class="field"><label for="s-maxlen">Maximum length</label><input type="number" id="s-maxlen" data-cfg="filename.max_length" min="40" max="250"></div>
+          <div class="field"><label for="s-dup">If the file already exists</label><select id="s-dup" data-cfg="downloads.duplicate_policy"></select></div>
+          <div class="field">
+            <label>Emoji</label>
+            <label class="switch"><input type="checkbox" id="s-emoji" data-cfg="filename.remove_emoji"><span class="track"></span><span class="switch-text">Remove emoji from filenames</span></label>
+          </div>
+        </div>
+        <div class="muted mono" id="template-preview" style="margin-top:6px"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>Subtitles</h2></div>
+        <div class="grid three">
+          <div class="field"><label for="s-submode">Mode</label><select id="s-submode" data-cfg="subtitles.mode"></select></div>
+          <div class="field"><label for="s-sublang">Languages</label><input type="text" id="s-sublang" data-cfg="subtitles.languages" placeholder="en, ar"></div>
+          <div class="field"><label for="s-subfmt">Format</label><select id="s-subfmt" data-cfg="subtitles.format"></select></div>
+        </div>
+        <label class="switch"><input type="checkbox" id="s-subauto" data-cfg="subtitles.auto_generated"><span class="track"></span><span class="switch-text">Include automatically generated captions</span></label>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>Metadata</h2></div>
+        <div class="stack">
+          <label class="switch"><input type="checkbox" id="s-meta" data-cfg="metadata.preserve_metadata"><span class="track"></span><span class="switch-text">Write title, artist and date into the file</span></label>
+          <label class="switch"><input type="checkbox" id="s-thumb" data-cfg="metadata.embed_thumbnail"><span class="track"></span><span class="switch-text">Embed the thumbnail as cover art</span></label>
+          <label class="switch"><input type="checkbox" id="s-chapters" data-cfg="metadata.embed_chapters"><span class="track"></span><span class="switch-text">Embed chapters when the source has them</span></label>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>Downloads</h2></div>
+        <div class="grid three">
+          <div class="field"><label for="s-conc">Concurrent downloads</label><input type="number" id="s-conc" data-cfg="downloads.concurrent" min="1" max="8"></div>
+          <div class="field"><label for="s-frag">Fragment concurrency</label><input type="number" id="s-frag" data-cfg="downloads.fragment_concurrency" min="1" max="16"></div>
+          <div class="field"><label for="s-retries">Retry count</label><input type="number" id="s-retries" data-cfg="downloads.retry_count" min="0" max="10"></div>
+          <div class="field"><label for="s-timeout">Timeout (seconds)</label><input type="number" id="s-timeout" data-cfg="downloads.timeout_seconds" min="30" max="3600"></div>
+          <div class="field"><label for="s-queue">Queue order</label><select id="s-queue" data-cfg="downloads.queue_behaviour"></select></div>
+          <div class="field">
+            <label>Retry</label>
+            <label class="switch"><input type="checkbox" id="s-autoretry" data-cfg="downloads.auto_retry"><span class="track"></span><span class="switch-text">Retry recoverable failures automatically</span></label>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>Storage</h2></div>
+        <div class="grid three">
+          <div class="field"><label for="s-temp">Temporary folder</label><input type="text" id="s-temp" data-cfg="storage.temp_dir"></div>
+          <div class="field"><label for="s-age">Remove temporary files older than (hours)</label><input type="number" id="s-age" data-cfg="storage.cleanup_age_hours" min="1" max="720"></div>
+          <div class="field"><label for="s-max">Storage ceiling (GB, 0 for none)</label><input type="number" id="s-max" data-cfg="storage.max_storage_gb" min="0"></div>
+        </div>
+        <div class="row wrap">
+          <label class="switch"><input type="checkbox" id="s-cleanup" data-cfg="storage.cleanup_temp"><span class="track"></span><span class="switch-text">Clean up temporary files automatically</span></label>
+          <button class="btn ghost sm" id="cleanup-btn">Clean up now</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>Interface</h2></div>
+        <div class="grid three">
+          <div class="field"><label for="s-theme">Theme</label><select id="s-theme" data-cfg="interface.theme"></select></div>
+          <div class="field">
+            <label>Motion</label>
+            <label class="switch"><input type="checkbox" id="s-anim" data-cfg="interface.animations"><span class="track"></span><span class="switch-text">Animations</span></label>
+          </div>
+          <div class="field">
+            <label>Density</label>
+            <label class="switch"><input type="checkbox" id="s-compact" data-cfg="interface.compact"><span class="track"></span><span class="switch-text">Compact mode</span></label>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>Advanced</h2></div>
+        <div class="stack" style="margin-bottom:14px">
+          <label class="switch"><input type="checkbox" id="s-debug" data-cfg="advanced.debug_mode"><span class="track"></span><span class="switch-text">Debug mode</span></label>
+          <label class="switch"><input type="checkbox" id="s-detailed" data-cfg="advanced.detailed_logs"><span class="track"></span><span class="switch-text">Detailed logs</span></label>
+        </div>
+        <div class="field" style="max-width:260px"><label for="s-logkeep">Log records to keep</label><input type="number" id="s-logkeep" data-cfg="advanced.log_retention" min="100" max="100000"></div>
+        <div class="row wrap">
+          <button class="btn ghost sm" id="cache-btn">Clear analysis cache</button>
+          <button class="btn ghost sm" data-goto="diagnostics">Run diagnostics</button>
+          <button class="btn danger sm" id="reset-btn">Reset all settings</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================== DIAGNOSTICS -->
+    <section class="view" id="view-diagnostics">
+      <div class="card">
+        <div class="card-head">
+          <h2>Diagnostics</h2>
+          <span class="spacer"></span>
+          <span class="pill" id="diag-overall">Not run</span>
+          <button class="btn" id="run-diag-btn">Run diagnostics</button>
+        </div>
+        <p class="muted" style="margin:0;font-size:12.5px">
+          Each check performs real work: it runs the binary, writes to the folder, opens the socket.
+        </p>
+      </div>
+      <div class="card flush" id="diag-results" hidden></div>
+    </section>
+
+    <!-- ================================================================= LOGS -->
+    <section class="view" id="view-logs">
+      <div class="card">
+        <div class="card-head">
+          <h2>Logs</h2>
+          <span class="spacer"></span>
+          <button class="btn ghost sm" id="export-logs-btn">Export</button>
+          <button class="btn danger sm" id="clear-logs-btn">Clear</button>
+        </div>
+        <div class="row wrap" style="margin-bottom:12px">
+          <input type="search" id="log-search" placeholder="Search messages" style="max-width:250px">
+          <select id="log-category" style="max-width:160px"><option value="">All categories</option></select>
+          <select id="log-level" style="max-width:140px"><option value="">All levels</option></select>
+        </div>
+        <div class="table-wrap" id="log-list"></div>
+      </div>
+    </section>
+
+    <!-- ================================================================ ABOUT -->
+    <section class="view" id="view-about">
+      <div class="card hero">
+        <div class="row" style="gap:16px;align-items:flex-start">
+          <span class="brand-mark" style="width:52px;height:52px;font-size:22px;border-radius:16px">H</span>
+          <div>
+            <h2 style="margin:0 0 4px;font-size:21px">Hoza YT</h2>
+            <p class="muted" style="margin:0;font-size:13.5px">
+              A local media downloading and processing application.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h2>Details</h2></div>
+        <dl class="kv" id="about-kv"></dl>
+      </div>
+      <div class="card">
+        <div class="card-head"><h2>What this application will not do</h2></div>
+        <ul class="muted" style="margin:0;padding-left:20px;font-size:13px;line-height:1.9">
+          <li>It does not bypass DRM, sign-in walls, or any other access control.</li>
+          <li>It does not invent formats. Every quality listed comes from the source.</li>
+          <li>It does not claim an output format the installed ffmpeg cannot produce.</li>
+          <li>It does not download live streams, which have no fixed end.</li>
+          <li>It does not delete your downloaded files when you remove a record.</li>
+        </ul>
+      </div>
+    </section>
+  </div>
+</div>
+
+<div class="modal-back" id="modal" hidden>
+  <div class="modal">
+    <div class="modal-head">
+      <h2 id="modal-title">Details</h2>
+      <span class="spacer" style="margin-left:auto"></span>
+      <button class="btn ghost icon" id="modal-close" aria-label="Close">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-foot" id="modal-foot"></div>
+  </div>
+</div>
+
+<div class="toasts" id="toasts"></div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

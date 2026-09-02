@@ -1,0 +1,99 @@
+name: Release
+
+# Tag a version and this packs the extension into the zip you load in Chrome,
+# then attaches it to a GitHub release. The server is not packed: it is run
+# from a clone, not installed from a zip.
+#
+#   git tag v2.0.1
+#   git push origin v2.0.1
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Version to build, e.g. v2.0.1'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    name: Package the extension
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Work out the version
+        id: version
+        run: |
+          tag="${{ github.event.inputs.tag || github.ref_name }}"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "number=${tag#v}" >> "$GITHUB_OUTPUT"
+          echo "Building $tag"
+
+      - name: Check the tag matches manifest.json
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import sys
+
+          wanted = os.environ["WANTED"]
+          found = json.load(open("manifest.json", encoding="utf-8"))["version"]
+          if found != wanted:
+              sys.exit(
+                  f"manifest.json says {found} but the tag says {wanted}.\n"
+                  f"Update manifest.json and server/app/__init__.py, then retag."
+              )
+          print(f"manifest.json and the tag agree on {found}")
+          PY
+        env:
+          WANTED: ${{ steps.version.outputs.number }}
+
+      - name: Build the zip
+        run: |
+          staging="$RUNNER_TEMP/hoza-yt"
+          mkdir -p "$staging"
+
+          # Only what Chrome loads. No server, no docs, no repository furniture.
+          cp manifest.json "$staging/"
+          cp -r src icons "$staging/"
+
+          find "$staging" -name '__pycache__' -prune -exec rm -rf {} + 2>/dev/null || true
+          find "$staging" -name '*.map' -delete
+
+          cd "$staging"
+          zip -r -9 "$GITHUB_WORKSPACE/hoza-yt-${{ steps.version.outputs.tag }}.zip" . -x '.*'
+
+          cd "$GITHUB_WORKSPACE"
+          unzip -l "hoza-yt-${{ steps.version.outputs.tag }}.zip"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hoza-yt-${{ steps.version.outputs.tag }}
+          path: hoza-yt-${{ steps.version.outputs.tag }}.zip
+          if-no-files-found: error
+
+      - name: Publish the release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: hoza-yt-${{ steps.version.outputs.tag }}.zip
+          generate_release_notes: true
+          body: |
+            ## Install
+
+            **Extension** — download the zip below, unpack it, then load the
+            folder at `chrome://extensions` with Developer mode on.
+
+            **Server** — clone the repository and run
+            `server/install-service.bat` once. It installs the dependencies and
+            sets the server to start with Windows and stay up on its own.
