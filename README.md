@@ -1,786 +1,634 @@
-<<<<<<< HEAD
-# Hoza YT v3
+# Hoza YT
 
-A local-first browser extension and media dashboard for downloading media that a page openly exposes. Hoza YT shows the formats a source actually offers, keeps downloads on your device, and does not bypass DRM, paywalls, sign-in walls, or other access controls.
-=======
+Hoza YT is a local-first browser extension and media dashboard for downloading
+media that a web page openly makes available. It shows the formats a source
+actually offers, lets you choose the quality, and keeps downloads on your
+computer.
 
-<h1 align="center">Hoza YT</h1>
+It does not bypass DRM, paywalls, login requirements, encryption, or other
+access controls. Only download media that you are authorized to save.
 
-<p align="center">
-  A browser extension and a local app that download video and audio from the web —
-  at the quality the source actually offers, and nothing it does not.
-</p>
->>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
+![Manifest V3](https://img.shields.io/badge/Manifest-V3-4c8dff)
+![Chrome 116+](https://img.shields.io/badge/Chrome-116%2B-4c8dff)
+![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-4c8dff)
+![License](https://img.shields.io/badge/data-local-34d399)
 
-<p align="center">
-  <img alt="Manifest V3" src="https://img.shields.io/badge/Manifest-V3-4c8dff">
-  <img alt="Chrome 116+" src="https://img.shields.io/badge/Chrome-116%2B-4c8dff">
-  <img alt="Python 3.10+" src="https://img.shields.io/badge/Python-3.10%2B-4c8dff">
-<<<<<<< HEAD
-  <img alt="Local only" src="https://img.shields.io/badge/data-local-34d399">
-</p>
+## Features
+
+- YouTube panel with separate video and audio quality lists.
+- Media detection for direct files, HTML media, HLS, and DASH manifests.
+- Quality presets: Best, Recommended, Best Compatibility, and Data Saver.
+- Native browser downloads for progressive media.
+- HLS and DASH segment assembly.
+- Download queue with pause, resume, retry, cancel, concurrency limits, and
+  recovery after a browser worker restart.
+- Duplicate detection, filename templates, collision handling, and history.
+- Local FastAPI dashboard backed by SQLite.
+- YouTube analysis through yt-dlp and optional track merging with FFmpeg.
+- Loopback-only local API by default, with request validation, rate limiting,
+  SSRF protection, and contained filesystem paths.
+- Optional native messaging support for automatically waking the local app.
 
 ## Screenshots
 
 ### YouTube panel
 
-The Hoza YT button appears beside YouTube actions. The panel keeps video and audio choices separate, shows real codecs and sizes, and lets you download the selected quality without leaving the page.
-
 | Video qualities | Audio qualities |
 | --- | --- |
-| ![Hoza YT video quality picker](docs/youtube-video-qualities.png) | ![Hoza YT audio quality picker](docs/youtube-audio-qualities.png) |
+| ![Video quality picker](docs/youtube-video-qualities.png) | ![Audio quality picker](docs/youtube-audio-qualities.png) |
 
-| YouTube action button | Panel dashboard tab |
+| YouTube action button | Dashboard tab |
 | --- | --- |
-| ![Hoza YT button beside YouTube actions](docs/youtube-panel.png) | ![Hoza YT dashboard tab](docs/youtube-dashboard-tab.png) |
+| ![Hoza YT button beside YouTube actions](docs/youtube-panel.png) | ![Dashboard tab](docs/youtube-dashboard-tab.png) |
 
 ### Local dashboard
 
-The local dashboard provides analysis, smart presets, queue control, history, settings, diagnostics, logs, and server management.
-
-| Download and analyze | All available qualities |
+| Download and analyze | Available qualities |
 | --- | --- |
 | ![Dashboard download page](docs/dashboard-download.png) | ![Dashboard quality list](docs/dashboard-all-qualities.png) |
 
 | Analysis details | Download history |
 | --- | --- |
-| ![Dashboard media analysis](docs/dashboard-analyse.png) | ![Dashboard history](docs/dashboard-history.png) |
+| ![Media analysis](docs/dashboard-analyse.png) | ![Download history](docs/dashboard-history.png) |
 
 | Settings | Server management |
 | --- | --- |
-| ![Dashboard settings](docs/dashboard-settings.png) | ![Dashboard servers](docs/dashboard-servers.png) |
+| ![Settings](docs/dashboard-settings.png) | ![Server management](docs/dashboard-servers.png) |
 
-![Hoza YT about page](docs/dashboard-about.png)
+### Application information
 
-## What v3 includes
-
-- Manifest V3 extension with a service-worker background architecture.
-- YouTube panel with video, audio, dashboard, about, and downloads sections.
-- Direct media detection for HTML media, direct files, HLS, and DASH manifests.
-- Quality ranking with Best, Recommended, Best Compatibility, and Data Saver presets.
-- Native browser downloads for progressive media.
-- Segment assembly for HLS and DASH streams.
-- Persistent queue with pause, resume, retry, cancel, concurrency limits, and recovery after worker restarts.
-- Duplicate detection, filename templates, collision handling, and download history.
-- Local FastAPI dashboard backed by SQLite.
-- yt-dlp extraction for YouTube and bundled ffmpeg support through `imageio-ffmpeg`.
-- Loopback-only API by default, request validation, rate limiting, SSRF protection, and contained filesystem paths.
-- Automatic local-app wake-up through the optional native messaging bridge.
-
-## How it works
-
-The extension and local app have separate responsibilities:
-
-| Component | Responsibility |
-| --- | --- |
-| `src/` | Detect media, inspect manifests, rank formats, manage the browser queue, and start browser downloads. |
-| `server/` | Analyze YouTube links with yt-dlp, merge separate tracks with ffmpeg, persist jobs, and serve the dashboard. |
-| `docs/` | Product screenshots used in this document. |
-
-On a normal page, the extension reads openly available media and downloads it directly. On YouTube, the extension sends the link through the background worker to the local app. The page never calls the local API directly.
+![Hoza YT About page](docs/dashboard-about.png)
 
 ## Install on Windows
 
-Download **`HozaYT-Setup.exe`** from the
-[latest release](https://github.com/rahozosman/download-youtube-vedio/releases),
-double-click it, and follow the wizard. It installs everything: the local
-engine, the media tools (ffmpeg and yt-dlp), and the connection your browser
-uses to reach them. There is no Python to install, no server to start, no
-terminal, and no administrator prompt — the whole installation is per-user.
+Download `HozaYT-Setup.exe` from the [latest GitHub
+release](https://github.com/rahozosman/extentions-YT/releases), run the
+installer, and follow the setup wizard.
 
-The engine starts by itself when your browser needs it and stops when you close
-your browser. Nothing runs in the background otherwise.
+The installer includes the local engine, Python runtime, yt-dlp, FFmpeg, and
+browser native-messaging registration. Chrome does not allow a desktop
+installer to silently install an unpacked extension, so the installer opens a
+setup page for the final browser-extension step.
 
-### The one step the installer cannot do
+### Install the extension manually
 
-Chrome does not allow a desktop program to install an extension silently, and
-Hoza YT does not try to work around that. From Chrome's documentation on
-alternative installation methods:
+Use this route when running from source:
 
-> As of Chrome 33, no external installs are allowed from a path to a local CRX
-> file on Windows.
+1. Open `chrome://extensions` in Chrome or `edge://extensions` in Edge.
+2. Enable **Developer mode**.
+3. Select **Load unpacked**.
+4. Choose the repository folder containing `manifest.json`.
 
-So the installer does everything else — and then opens a page that makes the
-remaining step as small as Chrome allows: it opens your browser's Extensions
-page for you, puts the extension's folder on your clipboard, and shows it in
-Explorer. Three clicks, and the page finishes itself the moment the extension
-connects.
+For Firefox, open `about:debugging`, select **This Firefox**, choose **Load
+Temporary Add-on**, and select `manifest.json`.
 
-Once Hoza YT is on the Chrome Web Store, the installer declares it and Chrome
-adds it on its own; see
-[ARCHITECTURE.md](docs/production/ARCHITECTURE.md#the-one-thing-an-installer-cannot-do).
+## Development setup
 
-### How the installed product fits together
+Requirements:
 
-```
-Chrome extension ──native messaging──▶ HozaYT.exe (host)
-                                            │
-                                            ▼
-                                       HozaYT.exe (supervisor)
-                                            │  picks a port, watches, restarts
-                                            ▼
-                                       HozaYT.exe (backend)  FastAPI · yt-dlp · ffmpeg
-```
+- Windows 10/11 for the installer build.
+- Python 3.10 or newer.
+- Node.js 18 or newer for project checks.
 
-One executable, three roles, chosen from its own command line — Chrome decides
-that line when it starts a native messaging host, so the product cannot ship
-three programs and tell Chrome which to run.
-
-| Document | What it covers |
-| --- | --- |
-| [ARCHITECTURE.md](docs/production/ARCHITECTURE.md) | how the installed product works, and why |
-| [BUILDING.md](docs/production/BUILDING.md) | building the installer |
-| [TROUBLESHOOTING.md](docs/production/TROUBLESHOOTING.md) | when something is wrong |
-
-### Uninstalling
-
-Settings ▸ Apps ▸ Hoza YT ▸ Uninstall. It stops the engine, removes the browser
-registration and deletes the program files, then asks whether to remove your
-settings and history as well. Your downloaded files are never touched.
-
-## Development
-
-The development workflow is unchanged, and nothing above is required for it.
+Install the backend dependencies:
 
 ```powershell
 python -m pip install -r server/requirements.txt
-python server/server.py
 ```
 
-Then load the repository folder at `chrome://extensions` with Developer mode
-on, or `manifest.json` at `about:debugging` in Firefox.
-
-The extension finds a development server by itself: with no native host
-registered it probes `127.0.0.1:8765` and uses it without a token. So a
-checkout and an unpacked extension behave exactly as they always have — see
-[ARCHITECTURE.md](docs/production/ARCHITECTURE.md#development-versus-production)
-for the full comparison.
+Start the local dashboard:
 
 ```powershell
-npm run check              # manifest, ids, parsing, routes, versions
-npm run build:installer    # dist/HozaYT-Setup.exe
+npm run dev
 ```
 
-> **Do not remove the `key` field from `manifest.json`.** It fixes the
-> extension's id, and the native messaging host is registered for that exact
-> id. Removing it disconnects every installation in the field.
+Then open `http://127.0.0.1:8765/` and load the repository as an unpacked
+extension in your browser. The development extension probes the local server
+automatically.
 
-## Dashboard features
+Useful commands:
 
-Open `http://127.0.0.1:8765/` to use:
-
-- Dashboard overview and health status.
-- Link analysis with stream facts and smart quality presets.
-- Video and audio format lists.
-- Queue progress, speed, ETA, pause, resume, retry, and cancel.
-- History search, filtering, file opening, and file reveal.
-- Settings for folders, quality defaults, naming, concurrency, and duplicate handling.
-- Server list and failover configuration.
-- Diagnostics and structured logs.
-- About information including extractor, ffmpeg, Python, and platform versions.
-
-## API overview
-
-| Method | Endpoint | Purpose |
-| --- | --- | --- |
-| `GET` | `/api/health` | Health, queue counts, ffmpeg state, and metrics. |
-| `GET` | `/api/about` | Version and runtime information. |
-| `POST` | `/api/analyze` | Analyze a URL and return verified formats. |
-| `POST` | `/api/jobs` | Queue a selected format. |
-| `GET` | `/api/jobs` | List jobs and progress. |
-| `POST` | `/api/jobs/{id}/pause` | Pause one job. |
-| `POST` | `/api/jobs/{id}/resume` | Resume one job. |
-| `POST` | `/api/jobs/{id}/cancel` | Cancel one job. |
-| `POST` | `/api/jobs/{id}/retry` | Retry a failed job. |
-| `GET` | `/api/history` | Read completed and failed downloads. |
-| `GET` / `PUT` | `/api/settings` | Read or update local settings. |
-| `GET` | `/api/diagnostics` | Run local health checks. |
-| `GET` | `/api/logs` | Read filtered application logs. |
-
-## Permissions and privacy
-
-Hoza YT stores settings, history, and the local database on the device. It does not use analytics, remote code, third-party scripts, or cloud uploads. The local server binds to loopback by default.
-
-| Permission | Why it is used |
+| Command | Purpose |
 | --- | --- |
-| `downloads` | Save files and track native download progress. |
-| `storage`, `unlimitedStorage` | Store settings, queue state, and history. |
-| `activeTab`, `scripting` | Inspect the active page after the user opens the panel. |
-| `offscreen` | Assemble segmented media in Chromium. |
-| `notifications` | Report completed and failed downloads. |
-| `contextMenus` | Provide optional right-click actions. |
-| `tabs` | Read the source tab title and URL. |
-| `alarms` | Perform queue maintenance. |
-| `nativeMessaging` | Request silent startup of the registered local host. |
+| `npm run dev` | Start the local FastAPI dashboard. |
+| `npm run dev:no-browser` | Start the server without opening a browser. |
+| `npm run check` | Validate manifest paths, JavaScript, Python, routes, and versions. |
+| `npm run verify` | Verify the native-host installation. |
+| `npm run diagnose` | Produce a full local diagnostic report. |
+| `npm run build:extension` | Build/stage the extension only. |
+| `npm run build:installer` | Build the Windows installer. |
 
-## Deliberate boundaries
+## Building the Windows installer
 
-- DRM, encrypted media, paywalls, and authentication barriers are not bypassed.
-- The extension does not invent qualities or upscale a source.
-- Separate video and audio tracks are labelled separately in the extension. The local app can mux them when ffmpeg is available.
-- Live streams without a defined end are not treated as ordinary downloadable files.
-- Downloads are intended for media the user is authorized to save.
-=======
-  <img alt="No build step" src="https://img.shields.io/badge/build-none-34d399">
-  <img alt="Local only" src="https://img.shields.io/badge/data-stays%20local-34d399">
-</p>
+Install the backend dependencies, PyInstaller, and Inno Setup 6. Then run:
 
----
-
-## What it looks like
-
-### On YouTube
-
-The **Hoza YT** button sits in the row with Like, Share and Save. Pressing it
-opens the panel directly underneath, without leaving the video.
-
-| Video qualities | Audio qualities |
-|---|---|
-| ![The panel on a YouTube video, listing every video quality with 1080p VP9 chosen](docs/youtube-video-qualities.png) | ![The same panel on its Audio tab, listing every track with a 152 kbps Opus track chosen](docs/youtube-audio-qualities.png) |
-
-Every line is a stream the video genuinely offers — resolution, codec,
-container and size — and the button underneath downloads exactly the one you
-picked. Nothing is re-encoded, and no quality is invented.
-
-| The button in the action row | The Dashboard section |
-|---|---|
-| ![The Hoza YT button beside Share and Save, with the quality panel open beneath it](docs/youtube-panel.png) | ![The panel's Dashboard section, offering to open the main dashboard](docs/youtube-dashboard-tab.png) |
-
-### The dashboard
-
-The local app serves its own dashboard at `127.0.0.1:8765`. The panel's
-Dashboard section opens it with the video already loaded.
-
-| Paste a link and analyse it | Every quality the link offers |
-|---|---|
-| ![The Download page: a pasted YouTube link, the media card, and the Smart Quality presets](docs/dashboard-download.png) | ![The same page scrolled down, showing all 28 video streams as a grid](docs/dashboard-all-qualities.png) |
-
-| The dashboard in the browser | History |
-|---|---|
-| ![The Download page at 127.0.0.1:8765, with stream counts, subtitles and upload date](docs/dashboard-analyse.png) | ![The History page: records, completed, failed and total size, over a table of finished downloads](docs/dashboard-history.png) |
-
-| Settings | Servers |
-|---|---|
-| ![Settings: download folder, default media type and quality, and the filename template](docs/dashboard-settings.png) | ![The Servers page: backend health, adding a second machine, and failover options](docs/dashboard-servers.png) |
-
-![The About page: version, developer, bundled ffmpeg and Python versions, and what the application will not do](docs/dashboard-about.png)
-
-> Some of these were taken before the rename, so the interface in them still
-> says **HOZA Download**. It is the same application.
-
----
-
-## The two halves
-
-Hoza YT is two programs that work together, and either works alone.
-
-| | What it is | What it handles |
-|---|---|---|
-| **The extension** (`src/`) | A Manifest V3 extension. No build step, no dependencies, no bundler. | Media a page exposes openly: `<video>`, `<audio>`, direct links, HLS and DASH manifests. |
-| **The local app** (`server/`) | A small FastAPI service with its own dashboard at `127.0.0.1:8765`. | YouTube, which signs and throttles its stream URLs — so it needs `yt-dlp` and `ffmpeg`, which an extension cannot carry. |
-
-They meet on the YouTube page itself: the extension puts a button in the
-action row, and the panel behind it talks to the local app.
-
----
-
-## On YouTube
-
-The extension adds a **Hoza YT** button in the same row as Like, Share and
-Save. Pressing it opens a panel anchored underneath with five sections:
-
-| Section | What it shows |
-|---|---|
-| **Video** | Every video quality the link offers — resolution, frame rate, codec, container, HDR, size. Pick one, download it. |
-| **Audio** | Every audio track — bitrate, codec, channels, sample rate, size. Tracks with compressed dynamic range are labelled `DRC`. |
-| **Dashboard** | Opens the full dashboard, with this video already loaded. |
-| **About** | Developer, contact, and the exact versions of the app, extension, yt-dlp, FFmpeg and Python. |
-| **Downloads** | The live queue: progress, speed and time remaining, updating while you watch. |
-
-The button is never absent. It takes the best place available and verifies it
-actually landed there:
-
-1. the **action row**, beside Like and Share;
-2. beside **Subscribe**, for older layouts;
-3. the **top bar**, on pages with no video — home, search, channels;
-4. a **floating pill**, if the page offers nothing to sit beside.
-
-Scroll down into the comments and a pill fades in at the corner, so the panel
-stays one click away. Open the home page and the button sits in the top bar;
-click into a video and it moves down into the action row by itself.
-
----
-
-## Install
-
-### 1. The local app
-
-Needed for YouTube. Python 3.10 or newer.
-
-```bash
-<<<<<<< HEAD
-pip install -r server/requirements.txt
-python server/server.py
-
-# On Windows that first run is the last one you have to think about: it sets
-# the server up to come and go with your browser by itself.
-=======
-# Windows: double-click server/install-service.bat — it installs what it
-# needs, starts the server now, and keeps it running from then on.
-
-# Any platform:
-pip install -r server/requirements.txt
-python server/server.py
->>>>>>> 69b39e3a1642109c7928230fe0e05911862f162f
+```powershell
+npm run check
+npm run build:installer
 ```
 
-It serves `http://127.0.0.1:8765`, binding to loopback by default (`--host`
-changes that). `yt-dlp` and a bundled `ffmpeg` (via `imageio-ffmpeg`) come in
-as dependencies — nothing has to be on your `PATH`.
+The installer is generated at:
 
-#### Never starting it by hand (Windows)
+```text
+dist/HozaYT-Setup.exe
+```
 
-A browser extension cannot launch a program on your machine, so the server has
-<<<<<<< HEAD
-to already be running when you click the toolbar button. Nothing has to be set
-up for that to be true: **the first time the server is ever started — however
-it is started — it registers itself and never needs starting again.**
+Other build modes:
 
-That one local run is unavoidable. An extension cannot launch a program on your
-machine, so something has to go first; `server.py` makes sure it only ever
-happens once, and that it is the run you were doing anyway.
+```powershell
+npm run build:installer:fast   # reuse the previous engine build
+npm run build:installer:slim   # omit bundled FFmpeg
+npm run build:extension        # stage only the extension
+```
 
-From then on the server's lifetime is the browser's. It starts a few seconds
-after the first browser window opens and stops about 25 seconds after the last
-one closes, so nothing is left running once there is nobody to serve. A
-download still in progress holds it open until the file is finished.
-
-Nothing below is required. It is here for when you want to look, or to change
-your mind:
-
-| Command | What it does |
-| --- | --- |
-| `python server/autorun.py --install` | Set it up now rather than on the first server start, and re-sync the installed copy after editing the code. |
-| `python server/autorun.py --status` | Is a browser open? Is the server up? Where is the log? |
-| `python server/autorun.py --stop` | Stops the server and autorun now. |
-| `python server/autorun.py --uninstall` | Removes the task and stops everything for good. |
-| `python server/autorun.py --update` | Run when downloads start failing. YouTube changes often. |
-| `python server/server.py` | Starts the server by hand, in a window you can watch. |
-
-There is no separate watchdog, and no `.bat`, `.ps1` or `.vbs`: all of it is
-Python, driving `schtasks` and the registry, both of which ship with Windows.
-
-**How it stays up.** Autorun looks for a browser every 3 seconds and asks
-`/api/health` every 15, restarting the server on either kind of failure:
-=======
-to already be running when you click the toolbar button. `install-service.bat`
-is the one thing you run, once:
-
-| Script | What it does |
-| --- | --- |
-| `server/install-service.bat` | **Run once.** Installs dependencies, registers the sign-in task, starts the watchdog now. |
-| `server/status.bat` | Is the server up? Is the watchdog up? Where is the log? |
-| `server/stop-server.bat` | Stops the watchdog, then the server. In that order, or it just comes back. |
-| `server/uninstall-service.bat` | Removes the task and stops everything for good. |
-| `server/start-server.bat` | Starts the server by hand, in a window you can watch. |
-| `server/update-yt-dlp.bat` | Run when downloads start failing. YouTube changes often. |
-
-**The watchdog** (`server/watchdog.py`) is what makes it stay up. It asks
-`/api/health` every 15 seconds and restarts the server on either kind of
-failure:
->>>>>>> 69b39e3a1642109c7928230fe0e05911862f162f
-
-- the process **died** — seen through the child's exit code
-- the process **hung** — seen through three silent health checks in a row,
-  which a plain restart-on-exit loop never catches
-
-Failed starts back off (5s → 15s → 30s → 1m → 2m → 5m) so a broken install
-<<<<<<< HEAD
-cannot spin the CPU, a lock file keeps two copies from fighting over the port,
-and an already-running server is adopted rather than duplicated. It logs to
-`data/autorun.log`, rotated at 1 MB.
-
-**And something watches autorun.** The scheduled task carries two triggers: one
-at sign-in, and one that repeats every ten minutes forever. The repeating one
-costs nothing while autorun is alive — `MultipleInstances` is `IgnoreNew`, so
-the task simply declines to start a second copy — and it is what brings autorun
-back if the process is ever killed.
-
-The task runs as you, at sign-in, with no time limit. **No administrator
-rights** — and if policy blocks task registration, the installer falls back to
-a per-user `Run` registry entry on its own. Nothing shows a console window:
-`pythonw.exe` runs autorun, and autorun spawns the server with
-`CREATE_NO_WINDOW`.
-
-`--install` copies the server to `%LOCALAPPDATA%\HozaYT\server` and runs it
-from there, so emptying or re-downloading the project cannot take the running
-copy with it. Re-run `--install` after editing the server to update that copy,
-or pass `--here` to run from the project folder instead.
-
-=======
-cannot spin the CPU, a lock file keeps two watchdogs from fighting over the
-port, and an already-running server is adopted rather than duplicated. It logs
-to `server/data/watchdog.log`, rotated at 1 MB.
-
-**And something watches the watchdog.** The scheduled task carries two
-triggers: one at sign-in, and one that repeats every ten minutes forever. The
-repeating one costs nothing while the watchdog is alive — `MultipleInstances`
-is `IgnoreNew`, so the task simply declines to start a second copy — and it is
-what brings the watchdog back if the process is ever killed. The launcher waits
-on the watchdog rather than firing and forgetting, which is what keeps the task
-in the `Running` state and makes that suppression work.
-
-The task runs as you, at sign-in, with no time limit. **No administrator
-rights** — and if policy blocks task registration, the installer falls back to
-a Startup-folder shortcut on its own. Nothing shows a console window:
-`pythonw.exe` runs the watchdog, and the watchdog spawns the server with
-`CREATE_NO_WINDOW`.
-
->>>>>>> 69b39e3a1642109c7928230fe0e05911862f162f
-Recovery times, worst case:
-
-| What died | Back up within |
-| --- | --- |
-| the server crashed or hung | ~45 seconds |
-<<<<<<< HEAD
-| autorun itself was killed | ~10 minutes |
-| the machine was restarted | sign-in, plus 15 seconds |
-=======
-| the watchdog itself was killed | ~10 minutes |
-| the machine was restarted | sign-in, plus 20 seconds |
->>>>>>> 69b39e3a1642109c7928230fe0e05911862f162f
-
-### 2. The extension
-
-**Chrome / Edge**
-
-1. Open `chrome://extensions` (or `edge://extensions`).
-2. Turn on **Developer mode**.
-3. **Load unpacked**, and select this folder.
-
-**Firefox** — the code runs against a compatibility layer, and Firefox's event
-page has DOM access, so segment assembly happens inline there rather than in an
-offscreen document. Load it through `about:debugging` → **This Firefox** →
-**Load Temporary Add-on**, selecting `manifest.json`.
-
-The extension asks for **no site access at all** on first run. You grant each
-site from the panel, and can revoke it at any time from the browser's
-extensions page. The one exception is `127.0.0.1:8765`, declared in the
-manifest so the panel can reach the local app.
-
----
-
-## What it deliberately does not do
-
-These are limits by design, not gaps waiting to be filled.
-
-**It does not circumvent protection.** When a page negotiates Encrypted Media
-Extensions, an HLS playlist carries `#EXT-X-KEY`, or a DASH manifest carries
-`<ContentProtection>`, it reports that the media is protected and stops. There
-is no key handling and no DRM path. Media behind a paywall or a login is not a
-target.
-
-**It does not invent quality.** The list shows what the source serves. There is
-no "320 kbps MP3" generated from a 128 kbps Opus source.
-
-**It does not download live streams.** A stream with no declared end has no
-well-defined file to produce.
-
-**The extension alone does not merge separate video and audio tracks.** Muxing
-needs an encoder. Where a source separates them, the options are labelled
-*Video only* and *Audio only*. The local app does merge them, because it has
-ffmpeg.
-
----
+The version is controlled by `manifest.json`. Update it once, run
+`npm run check`, and use the same version for the Git tag and GitHub release.
+See [docs/production/BUILDING.md](docs/production/BUILDING.md) for packaging,
+signing, third-party notices, and Web Store publishing.
 
 ## Architecture
 
-```
-manifest.json                 MV3 manifest — no host permissions but the local app
-docs/                         The screenshots used by this README
-
-src/                          The extension
-  core/                       Pure logic, no browser APIs
-    constants.js              Message types, enums, thresholds
-    errors.js                 Error taxonomy: codes -> what the user reads
-    hls-parser.js             HLS master and media playlists
-    dash-parser.js            MPD parsing and segment plans
-    xml.js                    Dependency-free XML reader (workers lack DOMParser)
-    quality-resolver.js       Ranking, badges, smart presets
-    filename.js               Template rendering and cross-platform sanitising
-    dedupe.js                 URL normalising and duplicate detection
-    assembler.js              Ordered segment fetch and join
-    settings.js  storage.js  browser-compat.js  format-utils.js
-
-  background/                 Service worker and collaborators
-    service-worker.js         Message router and lifecycle
-    local-server.js           Bridge to the local app, so the page never calls it
-    media-registry.js         Per-tab detected media, in memory only
-    net-observer.js           Read-only webRequest media sniffing
-    manifest-probe.js         Fetch, parse and resolve streams
-    download-manager.js       Native downloads and segment assembly
-    queue-manager.js          Jobs, concurrency, persistence, recovery
-    history.js  notifications.js  context-menu.js  offscreen-bridge.js
-
-  content/
-    panel.js                  The YouTube button and its in-page panel
-    detector.js               DOM scan (isolated world, no imports by necessity)
-    page-probe.js             EME observation (MAIN world, read-only)
-
-  offscreen/                  Blob assembly host — workers cannot make blob URLs
-  ui/                         popup, download manager, settings
-
-server/                       The local app
-  server.py                   Launcher
-  app/
-    main.py                   HTTP API and static hosting
-    analyzer.py               yt-dlp extraction, normalised into streams
-    formats.py                Presets, audio tiers, format selection
-    jobs.py                   Queue, progress, pause/resume/retry
-    downloader.py             The download itself, with disk guards
-    ffmpeg.py                 Probe and merge
-    db.py  config.py  security.py  servers.py  diagnostics.py  logs.py
-  static/                     The dashboard
-```
-
-**Data flow, extension.** `detector` and `net-observer` feed `media-registry`.
-`manifest-probe` turns a registry item into ranked streams. The UI renders
-those, and a choice becomes a job in `queue-manager`.
-
-**Data flow, YouTube.** `panel.js` asks the service worker, the service worker
-asks the local app, the local app runs `yt-dlp` and merges with `ffmpeg`. The
-page itself never calls the API — the server accepts only extension and
-loopback origins, so a content script's request would be refused anyway.
-
-### Two design notes
-
-**Why an offscreen document.** Chromium service workers have no
-`URL.createObjectURL`. Joined segments have to become a blob URL somewhere, so
-assembly happens in an offscreen document and the worker hands the resulting
-URL to `chrome.downloads`. Firefox event pages have DOM access, so the same
-assembler runs inline — the branch is a feature probe, not a UA check.
-
-**Why segment joining works without an encoder.** MPEG-TS segments concatenate
-into a playable `.ts`. Fragmented MP4 segments concatenate behind their
-initialisation segment into a playable `.mp4`. Both are byte-exact joins — and
-that is precisely why merging *separate* video and audio tracks is a different
-problem: that is muxing, not concatenation.
-
----
-
-## The dashboard
-
-`http://127.0.0.1:8765` — Dashboard, Download, Video, Audio, Queue, History,
-Servers, Settings, Diagnostics, Logs and About.
-
-Paste a link and it is analysed on paste. Pick a preset (**Best**,
-**Recommended**, **Best Compatibility**, **Data Saver**) or a specific format,
-and it downloads with live progress, pause, resume, retry and cancel.
-Downloads default to `~/Downloads/Hoza YT`.
-
-### API
-
-| Method | Path | Purpose |
-|---|---|---|
-| `GET` | `/api/health` | Status, queue counts, ffmpeg availability, metrics |
-| `GET` | `/api/about` | App, developer, contact, versions |
-| `POST` | `/api/analyze` | Every quality a link offers, plus presets and audio tiers |
-| `POST` | `/api/jobs` | Queue a download from a verified format selection |
-| `GET` | `/api/jobs` | The queue, with progress and stats |
-| `POST` | `/api/jobs/{id}/{pause\|resume\|cancel\|retry}` | Control one job |
-| `GET` | `/api/events` | Server-sent events: job created, progress, finished |
-| `GET` | `/api/history` | Completed and failed records |
-| `GET` `PUT` | `/api/settings` | Read and update configuration |
-| `GET` | `/api/diagnostics` | Self-checks: ffmpeg, extractor, disk, network |
-| `GET` | `/api/logs` | Recent log records, filterable |
-
-Every request body is validated at the boundary by Pydantic. Requests are rate
-limited (120/minute by default) and capped in size, URLs are checked against
-SSRF into the local network, and every path the app writes is contained inside
-a directory you approved.
-
----
-
-## Permissions
-
-| Permission | Why |
-|---|---|
-| `downloads` | Save files and report progress |
-| `storage`, `unlimitedStorage` | Settings and history, locally |
-| `activeTab` | Scan the current page when you open the panel |
-| `scripting` | Run that scan |
-| `webRequest` *(optional)* | Observe media responses on granted sites, read-only |
-| `offscreen` | Join segments into one file |
-| `notifications` | Report completion and failure |
-| `contextMenus` | Right-click entries |
-| `tabs` | Title and address of the tab a download came from |
-| `alarms` | Queue upkeep |
-| `http://127.0.0.1:8765/*` | Reach the local app |
-
-`webRequest` is *optional* rather than required, and is requested from the
-panel the first time you grant a site. Declaring it up front with no host
-permissions makes Chrome warn at load time that it can never fire — asking at
-the moment it becomes useful is quieter and more honest.
-
-## Privacy
-
-Everything stays on the device. Settings and history go to local extension
-storage and a local SQLite file; detected media lives in memory for the open
-tab and is dropped when that tab navigates away. No analytics, no telemetry,
-no third-party scripts, no remote code. Page contents are never uploaded, and
-the local app listens on loopback unless you tell it otherwise.
-
-`server/data/` — the database, your resolved configuration and the temporary
-directory — is git-ignored, because it is this machine's download history.
-
----
->>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
-
-## Keyboard shortcuts
-
-| Shortcut | Action |
-<<<<<<< HEAD
+| Directory | Responsibility |
 | --- | --- |
-| `Alt+Shift+D` | Open the Hoza YT panel. |
-| `Alt+Shift+Q` | Download the preferred quality. |
-| `Alt+Shift+M` | Open the download manager. |
+| `src/` | Extension UI, media detection, manifest parsing, quality ranking, and browser downloads. |
+| `server/` | FastAPI dashboard, yt-dlp extraction, FFmpeg integration, queue, database, and API. |
+| `native-host/` | Native messaging host, supervisor, registration, and diagnostics. |
+| `build/` | Validation and installer build scripts. |
+| `docs/production/` | Architecture, build, and troubleshooting documentation. |
 
-## Development checks
+For the installed product, Chrome connects to the native host, which starts a
+supervisor and a loopback FastAPI backend. Read
+[ARCHITECTURE.md](docs/production/ARCHITECTURE.md) for the full data flow and
+[TROUBLESHOOTING.md](docs/production/TROUBLESHOOTING.md) when something fails.
 
-Run these from the repository root:
+## Dashboard API
+
+The local API is served on loopback by default.
+
+| Method | Endpoint | Purpose |
+| --- | --- | --- |
+| `GET` | `/api/health` | Health, queue counts, and metrics. |
+| `GET` | `/api/about` | Runtime and version information. |
+| `POST` | `/api/analyze` | Analyze a media URL. |
+| `POST` | `/api/jobs` | Queue a selected format. |
+| `GET` | `/api/jobs` | List jobs and progress. |
+| `POST` | `/api/jobs/{id}/pause` | Pause a job. |
+| `POST` | `/api/jobs/{id}/resume` | Resume a job. |
+| `POST` | `/api/jobs/{id}/cancel` | Cancel a job. |
+| `POST` | `/api/jobs/{id}/retry` | Retry a failed job. |
+| `GET` | `/api/history` | Read download history. |
+| `GET` / `PUT` | `/api/settings` | Read or update local settings. |
+| `GET` | `/api/diagnostics` | Run local health checks. |
+
+## Privacy and permissions
+
+Hoza YT stores settings, queue state, history, and media metadata locally. It
+does not use analytics, cloud uploads, remote code, or third-party scripts.
+The local server binds to `127.0.0.1` by default.
+
+The extension uses browser permissions for downloads, local storage, tabs,
+active-page inspection, notifications, context-menu actions, queue alarms,
+offscreen segment assembly, and optional native messaging. Site access is
+requested only when needed and can be revoked from the browser's extension
+settings.
+
+## GitHub: update this project
+
+Run these commands in the folder that contains `manifest.json`.
+
+### First upload to a new GitHub repository
+
+Create an empty repository on GitHub, then run:
 
 ```powershell
-node --check src/background/local-server.js
-node --check src/background/service-worker.js
-node --check src/content/panel.js
-python -m py_compile server/server.py server/autorun.py server/native_host.py
+git init
+git add .
+git commit -m "Prepare Hoza YT release"
+git branch -M main
+git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPOSITORY.git
+git push -u origin main
 ```
 
-The extension has no bundler or build step. Load the repository folder directly in the browser while developing.
+Replace `YOUR_USERNAME/YOUR_REPOSITORY` with your GitHub repository name.
 
-## Troubleshooting
+### Push later changes
 
-**The panel is empty or keeps loading.** Confirm the local app is reachable at `http://127.0.0.1:8765/api/health`, then reload the extension and refresh the YouTube tab. The extension retries a normal cold start automatically.
+```powershell
+git status
+git add .
+git commit -m "Describe your change"
+git push
+```
 
-**The YouTube button is missing.** Reload the extension from the browser extensions page, then hard-refresh YouTube with `Ctrl+Shift+R`.
+To update only this README:
 
-**A quality is missing.** The source may not expose it, or it may be protected. Hoza YT lists source formats rather than generating unavailable qualities.
+```powershell
+git add README.md
+git commit -m "Improve project documentation"
+git push
+```
 
-**A download fails after analysis.** Open Diagnostics and Logs in the dashboard. Check ffmpeg availability and update yt-dlp when YouTube changes its delivery format.
+### Publish a versioned release
 
-## Project owner
+After updating the version in `manifest.json` and passing the checks:
 
-**Rahoz Osman** - <hozahoza2001@gmail.com>
+```powershell
+npm run check
+npm run build:installer
+git add .
+git commit -m "Release v3.0.0"
+git tag v3.0.0
+git push origin main --tags
+```
 
-Repository: <https://github.com/rahozosman/download-youtube-vedio>
-=======
-|---|---|
-| `Alt+Shift+D` | Open the panel |
-| `Alt+Shift+Q` | One-click download at your preferred quality |
-| `Alt+Shift+M` | Open the download manager |
+On GitHub, open **Releases** and choose the new tag. Attach
+`dist/HozaYT-Setup.exe` as a release asset, add release notes, and publish it.
 
-## Filename templates
+Do not commit private keys, local databases, generated installers, or secrets.
+Check `.gitignore` before using `git add .`.
 
-Extension default: `{title} - {quality}` → `How Lenses Bend Light - 1080p.mp4`
+## License and legal boundaries
 
-Tokens: `{title}` `{quality}` `{resolution}` `{codec}` `{audiocodec}`
-`{container}` `{fps}` `{duration}` `{domain}` `{date}` `{time}` `{index}`
+Review the repository's license and the notices generated during packaging
+before redistributing builds. FFmpeg and other bundled dependencies retain
+their own licenses.
 
-Reserved Windows device names, illegal characters, control characters, trailing
-dots and path traversal are all handled. Collisions become `Video (1).mp4`.
-The local app uses yt-dlp tokens instead: `%(title)s`, `%(height)s`,
-`%(uploader)s`, `%(id)s`.
+Hoza YT is designed for media that the user has permission to download. It
+does not handle DRM-protected, encrypted, paywalled, or authentication-gated
+media, and it does not upscale or invent unavailable qualities.
 
----
+## Quick Start
 
-## Continuous integration
+This section is for a first-time user.
 
-Three workflows run in GitHub Actions.
+### Windows installer
 
-| Workflow | When | What it does |
+1. Open the GitHub Releases page.
+2. Download `HozaYT-Setup.exe`.
+3. Run the installer.
+4. Follow the setup wizard.
+5. Finish the browser setup page.
+6. Enable the extension in the browser.
+7. Open a supported media page.
+8. Select a quality.
+9. Click Download.
+10. Open the saved file from your download folder.
+
+The installer includes the local engine, Python, yt-dlp, and FFmpeg.
+It registers the native messaging connection.
+It creates shortcuts for verification and diagnostics.
+
+### Source checkout
+
+Use the source workflow for development and testing.
+
+1. Install Python 3.10 or newer.
+2. Install Node.js 18 or newer.
+3. Open PowerShell in the project directory.
+4. Install the Python dependencies.
+5. Start the local server.
+6. Open the local dashboard.
+7. Load the extension as unpacked.
+8. Test a permitted media URL.
+
+```powershell
+python -m pip install -r server/requirements.txt
+npm run dev
+```
+
+Open `http://127.0.0.1:8765/` in the browser.
+Keep the server window open during source testing.
+Press `Ctrl+C` to stop the development server.
+
+### Chrome or Edge
+
+1. Open `chrome://extensions` or `edge://extensions`.
+2. Turn on **Developer mode**.
+3. Select **Load unpacked**.
+4. Select the folder containing `manifest.json`.
+5. Pin Hoza YT if you want quick toolbar access.
+
+### Firefox
+
+1. Open `about:debugging`.
+2. Select **This Firefox**.
+3. Select **Load Temporary Add-on**.
+4. Select the project's `manifest.json`.
+
+Temporary Firefox extensions are removed when the browser session ends.
+
+## How to Use Hoza YT
+
+Use the panel when you are already watching a video.
+Use the dashboard for detailed analysis and queue management.
+
+### Download from YouTube
+
+1. Open a YouTube video.
+2. Wait for the page to load.
+3. Find the Hoza YT button near the video actions.
+4. Open the **Video** tab.
+5. Review the available video rows.
+6. Select a quality.
+7. Click the download button.
+8. Monitor progress in **Downloads**.
+
+The panel can show resolution.
+The panel can show frame rate.
+The panel can show codec.
+The panel can show container.
+The panel can show HDR information.
+The panel can show estimated size.
+
+### Download audio
+
+1. Open the Hoza YT panel.
+2. Select the **Audio** tab.
+3. Compare bitrate and codec.
+4. Review sample rate and channels.
+5. Select an audio row.
+6. Click the download button.
+
+An audio-only job does not contain video.
+Choose a video row when you need a video file.
+
+### Use the dashboard
+
+1. Open `http://127.0.0.1:8765/`.
+2. Select **Download**.
+3. Paste a media URL.
+4. Select **Analyze**.
+5. Wait for the source details.
+6. Review the available streams.
+7. Choose a smart preset or individual format.
+8. Confirm the selection.
+9. Start the download.
+10. Open **Queue** to monitor the job.
+
+The dashboard can show title.
+The dashboard can show duration.
+The dashboard can show views.
+The dashboard can show upload date.
+The dashboard can show subtitles.
+The dashboard can show chapters.
+The dashboard can show HDR status.
+The dashboard can show video stream counts.
+The dashboard can show audio stream counts.
+
+### Analyze direct media
+
+1. Open a page containing openly available media.
+2. Open the Hoza YT panel.
+3. Grant site access if requested.
+4. Wait for detection.
+5. Select a detected item.
+6. Select one of the formats shown.
+7. Start the download.
+
+Supported sources can include direct media files.
+Supported sources can include HTML video elements.
+Supported sources can include HTML audio elements.
+Supported sources can include HLS playlists.
+Supported sources can include DASH manifests.
+Protected media is intentionally not processed.
+
+## Understanding Quality
+
+The largest number is not always the best format.
+Check resolution, codec, container, frame rate, and size together.
+
+### Resolution guide
+
+| Resolution | Common description | Typical use |
 | --- | --- | --- |
-| `ci.yml` | every push and pull request | Installs the server on Python 3.10 and 3.12, byte-compiles it, imports the app and asserts the expected routes exist, then boots the server and calls `/api/health`. Separately checks that every file `manifest.json` points at actually exists, and that every module under `src/` parses. |
-| `release.yml` | a `v*` tag | Refuses to build if the tag and `manifest.json` disagree, packs `manifest.json`, `src/` and `icons/` into `hoza-yt-<tag>.zip`, and attaches it to a GitHub release. |
-| `yt-dlp-watch.yml` | Mondays, 06:00 UTC | Compares the pin in `server/requirements.txt` against PyPI and keeps one rolling issue open when it has fallen behind. YouTube breaks downloads regularly and a stale `yt-dlp` is nearly always why. |
+| `2160p` | 4K | Large screens and archival copies. |
+| `1440p` | QHD | High quality with less storage than 4K. |
+| `1080p` | Full HD | General viewing and sharing. |
+| `720p` | HD | Smaller files with good clarity. |
+| `480p` | SD | Limited bandwidth or storage. |
+| `360p` | Small SD | Very limited bandwidth. |
 
-### What Actions cannot do
+The source may not offer every resolution.
+Hoza YT does not invent missing resolutions.
 
-It cannot host the server. Jobs are capped at six hours, the runner is
-destroyed when the job ends, nothing can reach it from outside without a
-tunnel, and GitHub's Actions policy limits the service to work on the
-repository itself — a long-lived server or tunnel is grounds for suspension.
+### Video codecs
 
-It would not help anyway. Downloads would land on GitHub's disk rather than
-yours, the extension talks to `127.0.0.1:8765`, and YouTube blocks datacenter
-addresses hard enough that `yt-dlp` fails on a runner almost immediately.
+| Codec | Strength | Consideration |
+| --- | --- | --- |
+| AVC / H.264 | Works on many devices. | Can require more storage. |
+| VP9 | Good quality per byte. | Hardware support varies. |
+| AV1 | Efficient modern compression. | Older devices may not decode it. |
 
-<<<<<<< HEAD
-The server is meant to be local. `autorun.py` is what makes it start and stop
-with your browser.
-=======
-The server is meant to be local. The watchdog is what makes it always-on.
->>>>>>> 69b39e3a1642109c7928230fe0e05911862f162f
+### Audio codecs
 
-### Release checks
+| Codec | Strength | Consideration |
+| --- | --- | --- |
+| AAC | Broad compatibility. | Not always the smallest option. |
+| Opus | Excellent low-bitrate quality. | Older players may need conversion. |
+| Vorbis | Open software support. | Less common in hardware players. |
 
-`/api/updates` asks GitHub whether a newer release exists, at most once a day:
+### Containers
 
-```bash
-curl http://127.0.0.1:8765/api/updates
+`MP4` is usually the safest choice for device compatibility.
+`WebM` commonly contains VP9, AV1, or Opus.
+`M4A` commonly contains audio-only AAC.
+The best container depends on the target player or editor.
+
+### Smart presets
+
+| Preset | Description |
+| --- | --- |
+| **Best Quality** | Chooses the highest available quality. |
+| **Recommended** | Balances quality, compatibility, and size. |
+| **Best Compatibility** | Prefers widely supported codecs. |
+| **Data Saver** | Chooses a smaller available format. |
+
+Presets resolve to streams shown by the analysis.
+They do not upscale the source.
+They do not create an unavailable quality.
+They do not silently replace the selected format.
+
+## YouTube Panel Guide
+
+### Video tab
+
+Use Video to compare video streams.
+Select a row to highlight it.
+The bottom button shows the selected resolution.
+The row can show a best-quality marker.
+The row can show an estimated size.
+
+### Audio tab
+
+Use Audio to compare audio streams.
+Look at bitrate and codec together.
+Check the channel layout.
+Check the sample rate.
+Check the container.
+Some rows include a dynamic-range marker.
+
+### Dashboard tab
+
+Dashboard opens the local application.
+The current video can be passed into analysis.
+Use this when the panel list is too compact.
+
+### Downloads tab
+
+Downloads shows current activity.
+Use Queue for full controls.
+Use History for completed results.
+
+### About tab
+
+About shows version information.
+It can show extractor information.
+It can show FFmpeg information.
+It can show Python information.
+It can show platform information.
+
+### Missing panel button
+
+The extension checks the YouTube action row.
+It checks the area near Subscribe.
+It checks the top page bar.
+It can use a floating button as a fallback.
+Reload YouTube after a layout change.
+Reload the extension if the button remains missing.
+
+## Dashboard Guide
+
+### Download page
+
+The Download page accepts a URL.
+Analyze requests source metadata.
+Refresh repeats an analysis.
+The result card displays source information.
+The preset area gives quick choices.
+The format area gives detailed choices.
+
+### Video page
+
+The Video page filters video formats.
+Compare resolution, frame rate, codec, container, and size.
+
+### Audio page
+
+The Audio page filters audio formats.
+Compare bitrate, codec, channels, sample rate, and size.
+
+### Queue page
+
+Queue lists active and waiting jobs.
+Each row can show title.
+Each row can show media type.
+Each row can show quality.
+Each row can show status.
+Each row can show progress.
+Each row can show speed.
+Each row can show estimated time.
+Each row can show destination filename.
+
+Use Pause for temporary bandwidth control.
+Use Resume to continue a paused job.
+Use Retry after correcting a failure.
+Use Cancel to stop a job.
+
+### History page
+
+History records completed and failed jobs.
+Use search to find a title.
+Use type filters to narrow results.
+Use result filters to find failures.
+Use sorting to change the order.
+Use Open to launch an existing file.
+Use Show to reveal a file in Explorer.
+Moved files can remain in history.
+
+### Settings page
+
+Settings are saved locally.
+Settings are shared with the extension.
+Choose a download folder.
+Choose the default media type.
+Choose the default quality.
+Choose a default preset.
+Enable automatic analysis when appropriate.
+Choose whether to start a default job.
+Configure the filename template.
+Set a maximum filename length.
+Choose collision behavior.
+Choose emoji handling.
+Set queue concurrency.
+Configure duplicate handling.
+
+### Servers page
+
+The local server is registered automatically.
+The page displays server health.
+It can display additional workers.
+It can configure failover behavior.
+It can allow jobs on remote workers.
+Use remote workers only on a network you control.
+Do not expose an unprotected API to the public internet.
+
+### Diagnostics page
+
+Diagnostics checks the local runtime.
+Run it after installation.
+Run it after changing registration.
+Run it when the extension cannot connect.
+Keep the report with the application version.
+Remove private paths before sharing it.
+
+### Logs page
+
+Logs separate host, supervisor, backend, and verification activity.
+Start with the timestamp of the failure.
+Look for startup errors.
+Look for port conflicts.
+Look for extractor errors.
+Look for FFmpeg errors.
+Look for permission errors.
+Never publish session tokens.
+Never publish private media URLs.
+
+## Filename Templates
+
+Templates help organize repeated downloads.
+Common tokens include `{title}` and `{quality}`.
+Other tokens include `{resolution}`, `{codec}`, and `{ext}`.
+
+```text
+{title} [{quality}].{ext}
 ```
 
-Nothing needs configuring. The repository is read from `git remote get-url
-origin`, overridden by `HOZA_GITHUB_REPO` if it is set, and the check reports
-itself `disabled` when there is no remote. A private repository or one with no
-releases reports `unavailable`, which is a state and not an error.
+The application removes invalid filename characters.
+It also limits long names to the configured maximum.
+Avoid putting complete URLs in filenames.
 
----
+## Release Checklist
 
-## Troubleshooting
+Before publishing a release, confirm the following:
 
-**The button is not on YouTube.** Reload the extension at `chrome://extensions`,
-then hard-refresh the tab (`Ctrl+Shift+R`). It logs one line on mount —
-`[Hoza YT] Download button mounted (actions)` — which tells you where it went.
+- The version in `manifest.json` is correct.
+- `npm run check` passes.
+- The installer builds successfully.
+- The extension loads in the target browser.
+- The dashboard starts on loopback.
+- A permitted test URL analyzes successfully.
+- A test download appears in History.
+- No secrets or private keys are staged.
+- The Git tag matches the manifest version.
 
-<<<<<<< HEAD
-**"The Hoza YT app is not running."** It should come up with your browser on
-its own. `python server/autorun.py --status` says what is running, and
-`data/autorun.log` says what happened. `python server/autorun.py --install`
-sets it up again if the task was removed.
+## Documentation Map
 
-**Downloads suddenly fail on YouTube.** YouTube changes often. Run
-`python server/autorun.py --update`, or `pip install -U yt-dlp`.
-=======
-**"The Hoza YT app is not running."** Run `server/install-service.bat` once so
-it comes up with Windows and stays up. `server/status.bat` says what is running,
-and `server/data/watchdog.log` says what happened.
+| Document | Purpose |
+| --- | --- |
+| `README.md` | Setup, usage, development, and publishing. |
+| `docs/production/ARCHITECTURE.md` | Installed product data flow. |
+| `docs/production/BUILDING.md` | Installer packaging and signing. |
+| `docs/production/TROUBLESHOOTING.md` | Startup and connection problems. |
 
-**Downloads suddenly fail on YouTube.** YouTube changes often. Run
-`server/update-yt-dlp.bat`, or `pip install -U yt-dlp`.
->>>>>>> 69b39e3a1642109c7928230fe0e05911862f162f
-
-**A second instance on the same machine** needs its own state:
-`python server/server.py --data-dir <path>`.
-
----
-
-## Developer
-
-**Rahoz Osman** — <hozahoza2001@gmail.com>
-
-Shown under **About** in both the panel and the dashboard. The manifest carries
-`"author": { "email": ... }`, the only authorship key Chrome recognises — a
-`developer` key makes Chrome log *Unrecognized manifest key*, so the name lives
-in the About section instead.
-
-## Responsible use
-
-Hoza YT is for media you are authorised to download. Respect the terms of the
-sites you visit and the rights of the people who made what you are saving. The
-protection boundaries above are not configurable.
-=======
-# youtube-extention
->>>>>>> 67db3dfe54c5271236cb8a165db766cffc3ecdf0
-#   d o w n l o a d - y o u t u b e - v e d i o  
- 
->>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
+Keep downloads lawful and use Hoza YT only with media you are authorized to
+save.
