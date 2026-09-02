@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <h1 align="center">Hoza YT</h1>
 
 <p align="center">
@@ -530,3 +531,6 @@ in the About section instead.
 Hoza YT is for media you are authorised to download. Respect the terms of the
 sites you visit and the rights of the people who made what you are saving. The
 protection boundaries above are not configurable.
+=======
+# youtube-extention
+>>>>>>> 67db3dfe54c5271236cb8a165db766cffc3ecdf0
