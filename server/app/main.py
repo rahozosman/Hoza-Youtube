@@ -38,6 +38,12 @@ from .security import ValidationError, contain, validate_server_url
 MAX_BODY_BYTES = 256 * 1024
 START_TIME = time.time()
 
+# The dashboard is served from disk and updated in place, so a browser holding
+# an old copy shows a page that no longer matches the API behind it. "no-cache"
+# does not mean "do not store": it means revalidate every time, and the ETag
+# FileResponse already sends turns that into a 304 whenever nothing changed.
+NO_CACHE = {"Cache-Control": "no-cache, must-revalidate"}
+
 _CREATE_NO_WINDOW = 0x08000000 if sys.platform.startswith("win") else 0
 
 
@@ -183,7 +189,7 @@ async def index():
     target = paths.STATIC_DIR / "index.html"
     if not target.exists():
         return PlainTextResponse("Dashboard files are missing from server/static.", 500)
-    return FileResponse(target, media_type="text/html")
+    return FileResponse(target, media_type="text/html", headers=NO_CACHE)
 
 
 @app.get("/static/{filename:path}", include_in_schema=False)
@@ -194,7 +200,7 @@ async def static_file(filename: str):
         raise fail(404, "Not found.")
     if not target.is_file():
         raise fail(404, "Not found.")
-    return FileResponse(target)
+    return FileResponse(target, headers=NO_CACHE)
 
 
 @app.get("/favicon.ico", include_in_schema=False)

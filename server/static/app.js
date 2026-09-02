@@ -1276,8 +1276,12 @@
       const host = $("server-list");
       host.textContent = "";
       for (const server of result.servers) host.appendChild(serverNode(server));
-      const healthy = result.servers.filter((s) => s.accepting_jobs).length;
-      $("nav-server-count").textContent = `${healthy}/${result.servers.length}`;
+      // A built-in entry with no address is not a server that is down, it is a
+      // server that does not exist yet. Counting it would read as "1/2" and
+      // send someone looking for a fault that is not there.
+      const usable = result.servers.filter((s) => s.configured);
+      const healthy = usable.filter((s) => s.accepting_jobs).length;
+      $("nav-server-count").textContent = `${healthy}/${usable.length}`;
     } catch (error) {
       reportError(error);
     }
