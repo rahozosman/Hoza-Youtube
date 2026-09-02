@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hoza YT — finish setup</title>
+<style>
+  :root {
+    color-scheme: dark;
+    --ink-0: #05060c;
+    --ink-2: #10131f;
+    --ink-3: #161a29;
+    --surface: rgba(255, 255, 255, 0.035);
+    --surface-2: rgba(255, 255, 255, 0.055);
+    --line: rgba(255, 255, 255, 0.09);
+    --line-strong: rgba(255, 255, 255, 0.16);
+    --text: #eef1f8;
+    --text-2: #a7b0c8;
+    --text-3: #6f7893;
+    --violet: #7c5cff;
+    --blue: #4b8dff;
+    --accent-grad: linear-gradient(135deg, #7c5cff 0%, #4b8dff 100%);
+    --ok: #34d399;
+    --ok-soft: rgba(52, 211, 153, 0.14);
+    --warn: #fbbf24;
+    --warn-soft: rgba(251, 191, 36, 0.14);
+    --r: 14px;
+    --r-lg: 20px;
+    --shadow: 0 10px 40px rgba(0, 0, 0, 0.45);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background:
+      radial-gradient(900px 520px at 12% -8%, rgba(124, 92, 255, 0.20), transparent 62%),
+      radial-gradient(760px 460px at 92% 4%, rgba(75, 141, 255, 0.16), transparent 60%),
+      var(--ink-0);
+    color: var(--text);
+    font: 15px/1.55 "Segoe UI", system-ui, -apple-system, sans-serif;
+    display: flex;
+    justify-content: center;
+    padding: 48px 20px 72px;
+  }
+
+  .sheet { width: 100%; max-width: 720px; }
+
+  header { display: flex; align-items: center; gap: 14px; margin-bottom: 30px; }
+
+  .mark {
+    width: 46px; height: 46px; border-radius: 13px;
+    background: var(--accent-grad);
+    display: grid; place-items: center;
+    font-weight: 700; font-size: 22px; color: #fff;
+    box-shadow: 0 8px 26px rgba(124, 92, 255, 0.35);
+  }
+
+  h1 { margin: 0; font-size: 20px; letter-spacing: -0.01em; }
+  .sub { margin: 2px 0 0; color: var(--text-3); font-size: 13px; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    padding: 24px 26px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(12px);
+  }
+
+  .banner { display: flex; gap: 14px; align-items: flex-start; }
+
+  .dot {
+    width: 11px; height: 11px; border-radius: 50%;
+    margin-top: 7px; flex: none;
+    background: var(--warn);
+    box-shadow: 0 0 0 5px var(--warn-soft);
+  }
+  .dot.pulse { animation: pulse 1.6s ease-in-out infinite; }
+  .dot.done { background: var(--ok); box-shadow: 0 0 0 5px var(--ok-soft); animation: none; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+
+  .banner h2 { margin: 0 0 3px; font-size: 16px; font-weight: 600; }
+  .banner p { margin: 0; color: var(--text-2); font-size: 13.5px; }
+
+  ol.steps { list-style: none; counter-reset: step; margin: 0; padding: 0; }
+
+  ol.steps li {
+    counter-increment: step;
+    position: relative;
+    padding: 0 0 22px 46px;
+    border-left: 1px solid var(--line);
+    margin-left: 15px;
+  }
+  ol.steps li:last-child { border-left-color: transparent; padding-bottom: 0; }
+
+  ol.steps li::before {
+    content: counter(step);
+    position: absolute; left: -15px; top: -2px;
+    width: 30px; height: 30px; border-radius: 50%;
+    background: var(--ink-3); border: 1px solid var(--line-strong);
+    display: grid; place-items: center;
+    font-size: 13px; font-weight: 600; color: var(--text-2);
+  }
+  ol.steps li.done::before {
+    content: "\2713";
+    background: var(--ok-soft); border-color: var(--ok); color: var(--ok);
+  }
+
+  ol.steps h3 { margin: 3px 0 5px; font-size: 14.5px; font-weight: 600; }
+  ol.steps p { margin: 0 0 10px; color: var(--text-2); font-size: 13.5px; }
+
+  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+
+  button {
+    font: inherit; font-size: 13.5px; font-weight: 500;
+    padding: 9px 16px; border-radius: 10px;
+    border: 1px solid var(--line-strong);
+    background: var(--surface-2); color: var(--text);
+    cursor: pointer; transition: 0.16s;
+  }
+  button:hover { background: rgba(255, 255, 255, 0.1); border-color: var(--violet); }
+  button.primary {
+    background: var(--accent-grad); border-color: transparent; color: #fff;
+    box-shadow: 0 6px 20px rgba(124, 92, 255, 0.32);
+  }
+  button.primary:hover { filter: brightness(1.08); }
+  button:disabled { opacity: 0.5; cursor: default; }
+
+  code.path {
+    display: block;
+    background: var(--ink-2); border: 1px solid var(--line);
+    border-radius: 10px; padding: 10px 13px;
+    font: 12.5px/1.5 "Cascadia Code", Consolas, monospace;
+    color: var(--text-2); word-break: break-all; margin-bottom: 10px;
+  }
+
+  .note {
+    margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line);
+    color: var(--text-3); font-size: 12.5px;
+  }
+  .note a { color: var(--blue); }
+
+  .hidden { display: none !important; }
+
+  .toast {
+    position: fixed; bottom: 26px; left: 50%; transform: translateX(-50%);
+    background: var(--ink-3); border: 1px solid var(--line-strong);
+    border-radius: 12px; padding: 11px 18px; font-size: 13.5px;
+    box-shadow: var(--shadow); opacity: 0; transition: opacity 0.2s;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<div class="sheet">
+  <header>
+    <div class="mark">H</div>
+    <div>
+      <h1>Hoza YT is installed</h1>
+      <p class="sub">Version {{VERSION}} &middot; the local engine is running on this computer</p>
+    </div>
+  </header>
+
+  <div class="card">
+    <div class="banner">
+      <span class="dot pulse" id="dot"></span>
+      <div>
+        <h2 id="headline">One step left in {{BROWSER}}</h2>
+        <p id="detail">Chrome only lets you add an extension yourself. Everything else is already done.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Web Store route: one click, when there is a listing to point at. -->
+  <div class="card hidden" id="store-card">
+    <ol class="steps">
+      <li>
+        <h3>Add Hoza YT to your browser</h3>
+        <p>This opens the official listing. Choose <strong>Add to Chrome</strong>, and this page will finish by itself.</p>
+        <div class="row">
+          <button class="primary" id="store-open">Open the Chrome Web Store</button>
+        </div>
+      </li>
+    </ol>
+  </div>
+
+  <!-- Local route: the extension ships with the installer. -->
+  <div class="card hidden" id="local-card">
+    <ol class="steps">
+      <li id="step-1">
+        <h3>Open your browser&rsquo;s Extensions page</h3>
+        <p>A web page is not allowed to take you to <code>{{EXTENSIONS_URL}}</code>, so this button asks the app to open it for you.</p>
+        <div class="row">
+          <button class="primary" id="open-extensions">Open the Extensions page</button>
+        </div>
+      </li>
+      <li id="step-2">
+        <h3>Turn on <em>Developer mode</em></h3>
+        <p>The switch is in the top-right corner of that page. It stays on and affects nothing else.</p>
+      </li>
+      <li id="step-3">
+        <h3>Click <em>Load unpacked</em> and choose this folder</h3>
+        <p>The installer already put the extension here:</p>
+        <code class="path" id="ext-path">{{EXTENSION_DIR}}</code>
+        <div class="row">
+          <button id="copy-path">Copy the folder path</button>
+          <button id="reveal-path">Show it in Explorer</button>
+        </div>
+      </li>
+    </ol>
+    <p class="note">
+      Nothing else is needed. The engine, the browser connection and the media
+      tools are installed and will start on their own from now on.
+    </p>
+  </div>
+
+  <div class="card hidden" id="done-card">
+    <div class="banner">
+      <span class="dot done"></span>
+      <div>
+        <h2>Everything is connected</h2>
+        <p>Hoza YT is ready. Open a video and use the Hoza YT button, or go straight to the dashboard.</p>
+      </div>
+    </div>
+    <div class="row" style="margin-top:16px">
+      <button class="primary" id="go-dashboard">Open the dashboard</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Everything the script needs, as data rather than as interpolated source.
+     A Windows path in a JavaScript string literal loses its backslashes to
+     escape sequences without any error to show for it. -->
+<script id="setup-context" type="application/json">{{CONTEXT_JSON}}</script>
+
+<script>
+(() => {
+  "use strict";
+
+  let CONTEXT = {};
+  try {
+    CONTEXT = JSON.parse(document.getElementById("setup-context").textContent);
+  } catch {
+    // A page that cannot read its own context can still show the steps.
+  }
+
+  const TOKEN = CONTEXT.TOKEN || "";
+  const WEBSTORE_ID = CONTEXT.WEBSTORE_ID || "";
+  const EXTENSION_DIR = CONTEXT.EXTENSION_DIR || "";
+
+  const $ = (id) => document.getElementById(id);
+
+  async function api(path, options = {}) {
+    const config = { ...options, headers: { ...(options.headers || {}) } };
+    if (TOKEN) config.headers["X-Hoza-Token"] = TOKEN;
+    const response = await fetch(`/api/${path}`, config);
+    if (!response.ok) throw new Error(`Request failed (${response.status})`);
+    return response.json().catch(() => null);
+  }
+
+  let toastTimer = null;
+  function toast(message) {
+    const node = $("toast");
+    node.textContent = message;
+    node.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => node.classList.remove("show"), 2600);
+  }
+
+  /* Which route this installation takes is decided at build time, not here:
+     a Web Store listing means one click, and no listing means the extension
+     that shipped with the installer is loaded from disk. */
+  if (WEBSTORE_ID) {
+    $("store-card").classList.remove("hidden");
+    $("store-open").addEventListener("click", () => {
+      window.open(
+        `https://chromewebstore.google.com/detail/${WEBSTORE_ID}`,
+        "_blank",
+        "noopener"
+      );
+    });
+  } else {
+    $("local-card").classList.remove("hidden");
+  }
+
+  $("open-extensions")?.addEventListener("click", async (event) => {
+    event.target.disabled = true;
+    try {
+      await api("setup/open-extensions", { method: "POST" });
+      $("step-1").classList.add("done");
+      toast("Opened the Extensions page");
+    } catch {
+      toast("Open your browser and go to its Extensions page");
+    } finally {
+      setTimeout(() => { event.target.disabled = false; }, 1200);
+    }
+  });
+
+  $("copy-path")?.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(EXTENSION_DIR);
+      toast("Folder path copied");
+    } catch {
+      // Clipboard access can be refused; selecting the text still works.
+      const range = document.createRange();
+      range.selectNodeContents($("ext-path"));
+      const selection = window.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+      toast("Press Ctrl+C to copy the selected path");
+    }
+  });
+
+  $("reveal-path")?.addEventListener("click", async () => {
+    try {
+      await api("setup/reveal-extension", { method: "POST" });
+      $("step-3").classList.add("done");
+      toast("Opened the folder");
+    } catch {
+      toast("The folder could not be opened");
+    }
+  });
+
+  $("go-dashboard").addEventListener("click", () => { window.location.href = "/"; });
+
+  /* The page finishes itself. The extension announces its presence to the
+     backend as soon as it loads, so nobody has to come back and confirm. */
+  let finished = false;
+
+  async function poll() {
+    if (finished) return;
+    try {
+      const state = await api("setup/state");
+      if (state?.extension?.connected) {
+        finished = true;
+        $("dot").classList.remove("pulse");
+        $("dot").classList.add("done");
+        $("headline").textContent = "Setup complete";
+        $("detail").textContent = "The extension found the local engine.";
+        $("store-card")?.classList.add("hidden");
+        $("local-card")?.classList.add("hidden");
+        $("done-card").classList.remove("hidden");
+        return;
+      }
+    } catch {
+      // The engine restarting mid-setup is not worth reporting; the next
+      // poll picks it up.
+    }
+    setTimeout(poll, 2000);
+  }
+
+  poll();
+})();
+</script>
+</body>
+</html>

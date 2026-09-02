@@ -1,0 +1,173 @@
+name: Release
+
+# Tag a version and this builds both halves of a release: the Windows
+# installer, which is what a person downloads, and the extension zip, which is
+# what goes to the Chrome Web Store.
+#
+#   git tag v3.0.1
+#   git push origin v3.0.1
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Version to build, e.g. v3.0.1'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  version:
+    name: Work out the version
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.read.outputs.tag }}
+      number: ${{ steps.read.outputs.number }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: read
+        run: |
+          tag="${{ github.event.inputs.tag || github.ref_name }}"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "number=${tag#v}" >> "$GITHUB_OUTPUT"
+          echo "Building $tag"
+
+      - name: Check the tag matches manifest.json
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import sys
+
+          wanted = os.environ["WANTED"]
+          found = json.load(open("manifest.json", encoding="utf-8"))["version"]
+          if found != wanted:
+              sys.exit(
+                  f"manifest.json says {found} but the tag says {wanted}.\n"
+                  f"Update manifest.json, then retag. build/build.py stamps every "
+                  f"other version from it."
+              )
+          print(f"manifest.json and the tag agree on {found}")
+          PY
+        env:
+          WANTED: ${{ steps.read.outputs.number }}
+
+  extension:
+    name: Package the extension
+    runs-on: ubuntu-latest
+    needs: version
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build the zip
+        run: |
+          staging="$RUNNER_TEMP/hoza-yt"
+          mkdir -p "$staging"
+
+          # Only what the browser loads. No server, no docs, no repository
+          # furniture. The manifest's "key" travels with it: it is what fixes
+          # the extension's id, and the native host is registered for that id.
+          cp manifest.json "$staging/"
+          cp -r src icons "$staging/"
+
+          find "$staging" -name '__pycache__' -prune -exec rm -rf {} + 2>/dev/null || true
+          find "$staging" -name '*.map' -delete
+
+          python - <<'PY'
+          import json
+          manifest = json.load(open("manifest.json", encoding="utf-8"))
+          assert manifest.get("key"), (
+              "manifest.json has no \"key\". Publishing without one gives the "
+              "extension a new id and disconnects every installation."
+          )
+          print("the extension keeps its id")
+          PY
+
+          cd "$staging"
+          zip -r -9 "$GITHUB_WORKSPACE/hoza-yt-${{ needs.version.outputs.tag }}.zip" . -x '.*'
+          unzip -l "$GITHUB_WORKSPACE/hoza-yt-${{ needs.version.outputs.tag }}.zip"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: extension
+          path: hoza-yt-${{ needs.version.outputs.tag }}.zip
+          if-no-files-found: error
+
+  installer:
+    name: Build the Windows installer
+    runs-on: windows-latest
+    needs: version
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: server/requirements.txt
+
+      - name: Install the build tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r server/requirements.txt pyinstaller
+          winget install --id JRSoftware.InnoSetup --silent `
+            --accept-source-agreements --accept-package-agreements
+
+      - name: Check before building
+        run: python build/check.py
+
+      - name: Build
+        run: python build/build.py
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: installer
+          path: dist/HozaYT-Setup.exe
+          if-no-files-found: error
+
+  publish:
+    name: Publish the release
+    runs-on: ubuntu-latest
+    needs: [version, extension, installer]
+    if: startsWith(github.ref, 'refs/tags/')
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            artifacts/installer/HozaYT-Setup.exe
+            artifacts/extension/hoza-yt-${{ needs.version.outputs.tag }}.zip
+          generate_release_notes: true
+          body: |
+            ## Install on Windows
+
+            Download **HozaYT-Setup.exe** below and double-click it.
+
+            It installs the local engine, the media tools and the browser
+            connection. No Python, no server to start, no terminal, and no
+            administrator prompt.
+
+            Chrome does not allow a desktop program to install an extension
+            silently, so setup finishes by opening a short page that adds the
+            extension for you in three clicks.
+
+            ## For the Chrome Web Store
+
+            `hoza-yt-${{ needs.version.outputs.tag }}.zip` is the extension on
+            its own, for uploading to the store.
+
+            ## Building it yourself
+
+            `npm run build:installer` — see
+            [BUILDING.md](docs/production/BUILDING.md).

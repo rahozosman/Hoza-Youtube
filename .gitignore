@@ -1,0 +1,87 @@
+# ---------------------------------------------------------------------------
+# Local application state
+#
+# server/data/ holds the SQLite database, the resolved configuration and the
+# temporary directory. It is this machine's download history and local paths —
+# never something to publish.
+# ---------------------------------------------------------------------------
+server/data/
+server/settings.json
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+
+# Logs and exports
+*.log
+hoza-logs-*.txt
+
+# Partial and in-flight downloads
+*.part
+*.ytdl
+*.temp
+*.tmp
+*.crdownload
+
+# ---------------------------------------------------------------------------
+# Python
+# ---------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+.venv/
+venv/
+env/
+.python-version
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ---------------------------------------------------------------------------
+# Packaged builds
+# ---------------------------------------------------------------------------
+dist/
+build/
+*.zip
+*.crx
+*.pem
+*.xpi
+web-ext-artifacts/
+
+# ---------------------------------------------------------------------------
+# Editors and operating systems
+# ---------------------------------------------------------------------------
+.idea/
+*.swp
+*~
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Keep shared VS Code settings, drop the per-machine ones.
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+
+# ---------------------------------------------------------------------------
+# Node, only if a tooling step is ever added — there is no build step today.
+# ---------------------------------------------------------------------------
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# ---------------------------------------------------------------------------
+# Production build
+#
+# The private key signs a CRX and derives nothing else: the extension's public
+# key lives in manifest.json, so a checkout without this file still builds an
+# extension with the same id. It must never be committed.
+# ---------------------------------------------------------------------------
+build/private/
+build/work/
+build/version-info.txt
+installer/assets/hozayt.ico

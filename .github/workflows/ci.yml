@@ -1,0 +1,160 @@
+name: CI
+
+# The two halves of this project break in different ways, so they are checked
+# differently: the server has to import on the Python versions the README
+# promises, and the extension has to reference only files that exist. A typo in
+# a manifest path is invisible until Chrome refuses to load the extension.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  server:
+    name: Server (Python ${{ matrix.python }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # The floor the README promises, and the version most people have.
+        python: ['3.10', '3.12']
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+          cache-dependency-path: server/requirements.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r server/requirements.txt
+
+      - name: Byte-compile every module
+        run: python -m compileall -q server
+
+      - name: Import the application
+        working-directory: server
+        env:
+          # Never let a check touch a real data directory.
+          HOZA_DATA_DIR: ${{ runner.temp }}/hoza-data
+        run: |
+          python - <<'PY'
+          import app.main
+
+          routes = [r for r in app.main.app.routes if getattr(r, "path", "").startswith("/api")]
+          print(f"app imported, {len(routes)} API routes")
+          assert routes, "no API routes were registered"
+
+          required = {"/api/health", "/api/about", "/api/analyze", "/api/jobs"}
+          missing = required - {r.path for r in routes}
+          assert not missing, f"missing routes: {sorted(missing)}"
+          print("all expected routes present")
+          PY
+
+      - name: Start the server and check health
+        working-directory: server
+        env:
+          HOZA_DATA_DIR: ${{ runner.temp }}/hoza-data
+        run: |
+          python server.py --no-browser &
+          for attempt in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8765/api/health > health.json; then
+              cat health.json
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "the server never answered" >&2
+          exit 1
+
+  extension:
+    name: Extension manifest
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Validate manifest.json
+        run: |
+          python - <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+
+          root = Path(".")
+          manifest = json.loads((root / "manifest.json").read_text(encoding="utf-8"))
+          print(f"{manifest['name']} {manifest['version']} (manifest v{manifest['manifest_version']})")
+
+          # Every path the manifest names, wherever it names one.
+          referenced: list[str] = []
+
+          def collect(value):
+              if isinstance(value, str):
+                  if value.endswith((".js", ".html", ".css", ".png", ".json")):
+                      referenced.append(value)
+              elif isinstance(value, dict):
+                  for item in value.values():
+                      collect(item)
+              elif isinstance(value, list):
+                  for item in value:
+                      collect(item)
+
+          collect(manifest)
+
+          missing = sorted({p for p in referenced if not (root / p).is_file()})
+          for path in sorted(set(referenced)):
+              print(f"  {'ok  ' if (root / path).is_file() else 'MISS'} {path}")
+
+          if missing:
+              print(f"\n{len(missing)} referenced file(s) do not exist:", file=sys.stderr)
+              for path in missing:
+                  print(f"  {path}", file=sys.stderr)
+              sys.exit(1)
+
+          print(f"\nall {len(set(referenced))} referenced files exist")
+          PY
+
+      - name: Check every source file parses
+        run: |
+          # No bundler here, so the cheapest real check is that the browser
+          # would not choke on an unbalanced file. Node does the parsing.
+          #
+          # The tree mixes both module kinds: background and core files are ES
+          # modules, content scripts are classic scripts. A file only has to
+          # parse as one of them, so each is tried as a script first and then
+          # as a module.
+          mkdir -p "$RUNNER_TEMP/esm"
+          failed=0
+          checked=0
+
+          for file in $(find src -name '*.js' | sort); do
+            copy="$RUNNER_TEMP/esm/$(echo "$file" | tr '/' '_')m.mjs"
+            cp "$file" "$copy"
+            if node --check "$file" 2>/dev/null || node --check "$copy" 2>/dev/null; then
+              checked=$((checked + 1))
+            else
+              echo "::error file=$file::does not parse as a script or a module"
+              node --check "$copy" || true
+              failed=1
+            fi
+          done
+
+          echo "$checked file(s) parsed"
+          exit $failed
