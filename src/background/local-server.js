@@ -22,7 +22,7 @@ const inFlight = new Map();
 const OFFLINE = {
   error: 'The Hoza YT app is not running.',
   code: 'server_offline',
-  hint: 'Run server/install-autostart.bat once and it will start with Windows from now on.',
+  hint: 'Run server/install-service.bat once and it will start with Windows and stay up on its own.',
   retryable: true,
 };
 

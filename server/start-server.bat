@@ -2,8 +2,8 @@
 title Hoza YT Server
 cd /d "%~dp0"
 
-rem -silent is what start-server-hidden.vbs passes at sign-in: no browser tab,
-rem and never stop on a prompt, because there is no window for anyone to click.
+rem -silent suppresses the browser tab and every pause, for any caller that
+rem runs this with no window for a person to click.
 set "SILENT="
 if /i "%~1"=="-silent" set "SILENT=1"
 
