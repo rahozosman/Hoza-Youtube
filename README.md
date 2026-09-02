@@ -18,14 +18,6 @@
 
 
 
-> GitHub does not always play a repository-hosted `.mp4` inline. If the player
-> above is not interactive, the image is a link to the file. To get a real
-> inline player, drag `docs/demo.mp4` into a GitHub issue, copy the
-> `user-images.githubusercontent.com` URL it produces, and paste that here.
->
-> The recording predates the rename, so the interface in it still says
-> "HOZA Download".
-
 ---
 
 ## The two halves
