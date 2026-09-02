@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 <h1 align="center">Hoza YT</h1>
 
 <p align="center">
