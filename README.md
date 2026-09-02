@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <h1 align="center">Hoza YT</h1>
 
 <p align="center">
@@ -421,3 +422,7 @@ in the About section instead.
 Hoza YT is for media you are authorised to download. Respect the terms of the
 sites you visit and the rights of the people who made what you are saving. The
 protection boundaries above are not configurable.
+=======
+# youtube-extention
+Hoza is a fast, simple YouTube video downloader that lets you save videos and audio in multiple quality options. Choose your preferred format and quality, download quickly, and enjoy a clean, modern experience designed for easy and convenient media saving.
+>>>>>>> fb4500c5ecd3346995d97cbb28bf66642ef70c84
