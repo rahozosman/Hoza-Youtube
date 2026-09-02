@@ -27,6 +27,7 @@
     JOBS: 'hoza:jobs',
     ABOUT: 'hoza:about',
     DASHBOARD: 'ui:dashboard',
+<<<<<<< HEAD
     STATE: 'hoza:state:get',
     RETRY: 'hoza:state:retry',
     STATE_CHANGED: 'hoza:state:changed',
@@ -41,6 +42,8 @@
     ready: false,
     error: null,
     hint: null,
+=======
+>>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
   };
 
   const SECTIONS = [
@@ -72,7 +75,10 @@
     aboutError: null,
     jobs: [],
     jobsError: null,
+<<<<<<< HEAD
     connection: { ...CONNECTION_UNKNOWN },
+=======
+>>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
   };
 
   let host = null; // panel host element
@@ -127,6 +133,7 @@
   const errorText = (error) =>
     error?.error || error?.title || 'Something went wrong.';
 
+<<<<<<< HEAD
   /** The connection, phrased as an error record the existing cards can render. */
   function connectionProblem() {
     return {
@@ -163,6 +170,8 @@
     if (report && report.state) applyConnection(report);
   }
 
+=======
+>>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
   const el = (tag, className, text) => {
     const node = document.createElement(tag);
     if (className) node.className = className;
@@ -1449,7 +1458,10 @@ button img {
     requestAnimationFrame(moveSlider);
 
     if (state.url && state.analysisUrl !== state.url && !state.loading) loadAnalysis();
+<<<<<<< HEAD
     void loadConnection();
+=======
+>>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
     startJobPolling();
 
     document.addEventListener('keydown', onKeydown, true);
@@ -1534,12 +1546,15 @@ button img {
 
   function updateSubtitle() {
     if (!refs.subtitle) return;
+<<<<<<< HEAD
     // A connection that is not ready is the most useful thing the header can
     // say, so it outranks everything else.
     if (!state.connection.ready && state.connection.state !== 'unknown') {
       refs.subtitle.textContent = state.connection.text;
       return;
     }
+=======
+>>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
     if (state.loading) refs.subtitle.textContent = 'Reading the available qualities…';
     else if (state.analysis) {
       const video = state.analysis.video?.length ?? 0;
@@ -1754,7 +1769,11 @@ button img {
     open.addEventListener('click', () => openDashboard());
 
     const note = el('p', null,
+<<<<<<< HEAD
       'The dashboard opens in a new tab with this video already loaded.');
+=======
+      'The dashboard opens in a new tab at 127.0.0.1:8765 with this video already loaded.');
+>>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
     note.style.cssText = 'margin-top:10px;font-size:11px;line-height:1.6;color:#7f89a3;text-align:center';
 
     refs.body.append(card, open, note);
@@ -1965,7 +1984,11 @@ button img {
       state.aboutError = null;
     } else {
       state.about = null;
+<<<<<<< HEAD
       state.aboutError = response.error ?? connectionProblem();
+=======
+      state.aboutError = response.error ?? { error: 'The local app is not running.' };
+>>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
     }
     if (state.section === 'about') render();
   }
@@ -1977,7 +2000,11 @@ button img {
       state.jobsError = null;
     } else {
       state.jobs = [];
+<<<<<<< HEAD
       state.jobsError = response.error ?? connectionProblem();
+=======
+      state.jobsError = response.error ?? { error: 'The local app is not running.' };
+>>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
     }
     updateActivityDot();
     if (state.section === 'downloads') paintJobs();

@@ -422,6 +422,7 @@ details.advanced[open] > summary .icon { transform: rotate(180deg); }
 }
 
 .sheet-actions .btn-wide { grid-column: 1 / -1; }
+<<<<<<< HEAD
 
 /* ---------------------------------------------------------- engine state
  *
@@ -462,3 +463,5 @@ details.advanced[open] > summary .icon { transform: rotate(180deg); }
 @media (prefers-reduced-motion: reduce) {
   .engine-dot { animation: none; }
 }
+=======
+>>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57

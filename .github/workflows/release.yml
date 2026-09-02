@@ -1,11 +1,20 @@
 name: Release
 
+<<<<<<< HEAD
 # Tag a version and this builds both halves of a release: the Windows
 # installer, which is what a person downloads, and the extension zip, which is
 # what goes to the Chrome Web Store.
 #
 #   git tag v3.0.1
 #   git push origin v3.0.1
+=======
+# Tag a version and this packs the extension into the zip you load in Chrome,
+# then attaches it to a GitHub release. The server is not packed: it is run
+# from a clone, not installed from a zip.
+#
+#   git tag v2.0.1
+#   git push origin v2.0.1
+>>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
 
 on:
   push:
@@ -13,24 +22,43 @@ on:
   workflow_dispatch:
     inputs:
       tag:
+<<<<<<< HEAD
         description: 'Version to build, e.g. v3.0.1'
+=======
+        description: 'Version to build, e.g. v2.0.1'
+>>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
         required: true
 
 permissions:
   contents: write
 
 jobs:
+<<<<<<< HEAD
   version:
     name: Work out the version
     runs-on: ubuntu-latest
     outputs:
       tag: ${{ steps.read.outputs.tag }}
       number: ${{ steps.read.outputs.number }}
+=======
+  package:
+    name: Package the extension
+    runs-on: ubuntu-latest
+>>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
 
     steps:
       - uses: actions/checkout@v4
 
+<<<<<<< HEAD
       - id: read
+=======
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Work out the version
+        id: version
+>>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
         run: |
           tag="${{ github.event.inputs.tag || github.ref_name }}"
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
@@ -49,12 +77,17 @@ jobs:
           if found != wanted:
               sys.exit(
                   f"manifest.json says {found} but the tag says {wanted}.\n"
+<<<<<<< HEAD
                   f"Update manifest.json, then retag. build/build.py stamps every "
                   f"other version from it."
+=======
+                  f"Update manifest.json and server/app/__init__.py, then retag."
+>>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
               )
           print(f"manifest.json and the tag agree on {found}")
           PY
         env:
+<<<<<<< HEAD
           WANTED: ${{ steps.read.outputs.number }}
 
   extension:
@@ -64,21 +97,29 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+=======
+          WANTED: ${{ steps.version.outputs.number }}
+>>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
 
       - name: Build the zip
         run: |
           staging="$RUNNER_TEMP/hoza-yt"
           mkdir -p "$staging"
 
+<<<<<<< HEAD
           # Only what the browser loads. No server, no docs, no repository
           # furniture. The manifest's "key" travels with it: it is what fixes
           # the extension's id, and the native host is registered for that id.
+=======
+          # Only what Chrome loads. No server, no docs, no repository furniture.
+>>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
           cp manifest.json "$staging/"
           cp -r src icons "$staging/"
 
           find "$staging" -name '__pycache__' -prune -exec rm -rf {} + 2>/dev/null || true
           find "$staging" -name '*.map' -delete
 
+<<<<<<< HEAD
           python - <<'PY'
           import json
           manifest = json.load(open("manifest.json", encoding="utf-8"))
@@ -171,3 +212,40 @@ jobs:
 
             `npm run build:installer` — see
             [BUILDING.md](docs/production/BUILDING.md).
+=======
+          cd "$staging"
+          zip -r -9 "$GITHUB_WORKSPACE/hoza-yt-${{ steps.version.outputs.tag }}.zip" . -x '.*'
+
+          cd "$GITHUB_WORKSPACE"
+          unzip -l "hoza-yt-${{ steps.version.outputs.tag }}.zip"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hoza-yt-${{ steps.version.outputs.tag }}
+          path: hoza-yt-${{ steps.version.outputs.tag }}.zip
+          if-no-files-found: error
+
+      - name: Publish the release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: hoza-yt-${{ steps.version.outputs.tag }}.zip
+          generate_release_notes: true
+          body: |
+            ## Install
+
+            **Extension** — download the zip below, unpack it, then load the
+            folder at `chrome://extensions` with Developer mode on.
+
+<<<<<<< HEAD
+            **Server** — clone the repository, then
+            `pip install -r server/requirements.txt` and
+            `python server/server.py`. On Windows that first run sets the
+            server to start with your browser and stop when you close it, so
+            there is nothing else to run.
+=======
+            **Server** — clone the repository and run
+            `server/install-service.bat` once. It installs the dependencies and
+            sets the server to start with Windows and stay up on its own.
+>>>>>>> 69b39e3a1642109c7928230fe0e05911862f162f
+>>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57

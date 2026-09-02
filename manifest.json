@@ -1,6 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Hoza YT",
+<<<<<<< HEAD
   "version": "3.0.0",
   "description": "Detect and download video and audio that a page makes openly available, with a quality picker, queue and download manager.",
   "minimum_chrome_version": "116",
@@ -8,6 +9,14 @@
   "author": {
     "email": "hozahoza2001@gmail.com"
   },
+=======
+  "version": "1.0.0",
+  "description": "Detect and download video and audio that a page makes openly available, with a quality picker, queue and download manager.",
+  "minimum_chrome_version": "116",
+
+  "author": { "email": "hozahoza2001@gmail.com" },
+
+>>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
   "action": {
     "default_popup": "src/ui/popup/popup.html",
     "default_title": "Hoza YT",
@@ -18,20 +27,36 @@
       "128": "icons/icon-128.png"
     }
   },
+<<<<<<< HEAD
+=======
+
+>>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
   "icons": {
     "16": "icons/icon-16.png",
     "32": "icons/icon-32.png",
     "48": "icons/icon-48.png",
     "128": "icons/icon-128.png"
   },
+<<<<<<< HEAD
+=======
+
+>>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
   "background": {
     "service_worker": "src/background/service-worker.js",
     "type": "module"
   },
+<<<<<<< HEAD
+=======
+
+>>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
   "options_ui": {
     "page": "src/ui/options/options.html",
     "open_in_tab": true
   },
+<<<<<<< HEAD
+=======
+
+>>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
   "permissions": [
     "storage",
     "unlimitedStorage",
@@ -42,6 +67,7 @@
     "activeTab",
     "tabs",
     "offscreen",
+<<<<<<< HEAD
     "alarms",
     "nativeMessaging"
   ],
@@ -49,12 +75,23 @@
     "http://127.0.0.1/*",
     "http://localhost/*"
   ],
+=======
+    "alarms"
+  ],
+
+  "host_permissions": [
+    "http://127.0.0.1:8765/*",
+    "http://localhost:8765/*"
+  ],
+
+>>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
   "content_scripts": [
     {
       "matches": [
         "https://youtube.com/*",
         "https://*.youtube.com/*"
       ],
+<<<<<<< HEAD
       "js": [
         "src/content/detector.js",
         "src/content/panel.js"
@@ -85,12 +122,35 @@
       "suggested_key": {
         "default": "Alt+Shift+M"
       },
+=======
+      "js": ["src/content/detector.js", "src/content/panel.js"],
+      "run_at": "document_idle"
+    }
+  ],
+
+  "optional_permissions": ["webRequest"],
+
+  "optional_host_permissions": ["*://*/*"],
+
+  "commands": {
+    "_execute_action": {
+      "suggested_key": { "default": "Alt+Shift+D" },
+      "description": "Open the Hoza YT panel"
+    },
+    "quick-download": {
+      "suggested_key": { "default": "Alt+Shift+Q" },
+      "description": "One-click download using your preferred quality"
+    },
+    "open-manager": {
+      "suggested_key": { "default": "Alt+Shift+M" },
+>>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
       "description": "Open the download manager"
     },
     "toggle-pause-all": {
       "description": "Pause or resume all downloads"
     }
   },
+<<<<<<< HEAD
   "web_accessible_resources": [
     {
       "resources": [
@@ -105,6 +165,20 @@
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'"
   },
+=======
+
+  "web_accessible_resources": [
+    {
+      "resources": ["icons/icon-48.png"],
+      "matches": ["https://youtube.com/*", "https://*.youtube.com/*"]
+    }
+  ],
+
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'"
+  },
+
+>>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
   "browser_specific_settings": {
     "gecko": {
       "id": "hoza-yt@hozadownload.local",

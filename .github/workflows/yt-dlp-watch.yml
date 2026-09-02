@@ -80,6 +80,7 @@ jobs:
           body=$(cat <<EOF
           PyPI now has **yt-dlp $LATEST**. \`server/requirements.txt\` pins \`yt-dlp>=$PINNED\`.
 
+<<<<<<< HEAD
           On a machine running the server from a checkout:
 
           \`\`\`
@@ -90,6 +91,18 @@ jobs:
           updated by a new release rather than in place: raise the floor, tag a
           version, and the installer built for it ships the newer extractor.
 
+=======
+          On any machine already running the server:
+
+          \`\`\`
+<<<<<<< HEAD
+          python server/autorun.py --update
+=======
+          server/update-yt-dlp.bat
+>>>>>>> 69b39e3a1642109c7928230fe0e05911862f162f
+          \`\`\`
+
+>>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
           To raise the floor in the repository, edit \`server/requirements.txt\`:
 
           \`\`\`

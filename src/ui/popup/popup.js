@@ -71,6 +71,7 @@ function isYouTubeUrl(url) {
 }
 
 function openYouTubeServer() {
+<<<<<<< HEAD
   // The local app chooses its own port, so the background worker opens the
   // dashboard rather than the popup guessing an address.
   void chrome.runtime.sendMessage({
@@ -78,6 +79,10 @@ function openYouTubeServer() {
     url: state.tab?.url ?? '',
     title: state.tab?.title ?? null,
   });
+=======
+  const target = `http://127.0.0.1:8765/?url=${encodeURIComponent(state.tab?.url ?? '')}`;
+  void chrome.tabs.create({ url: target });
+>>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
   window.close();
 }
 
@@ -804,6 +809,7 @@ async function refreshQueue() {
   }
 }
 
+<<<<<<< HEAD
 /* ---------------------------------------------------------- engine state
  *
  * One line, and only while the local app is not simply working. Nothing here
@@ -829,6 +835,8 @@ async function loadEngineState() {
   if (report) paintEngineState(report);
 }
 
+=======
+>>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
 /* ------------------------------------------------------------------- boot */
 
 async function init() {
@@ -853,9 +861,12 @@ async function init() {
     return;
   }
 
+<<<<<<< HEAD
   subscribe(MSG.SERVER_STATE, (message) => paintEngineState(message));
   void loadEngineState();
 
+=======
+>>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
   subscribe(MSG.JOBS_CHANGED, () => void refreshQueue());
   subscribe(MSG.MEDIA_CHANGED, (message) => {
     if (message.tabId === state.tab.id && !state.streams.length) {

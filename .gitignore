@@ -73,6 +73,7 @@ Desktop.ini
 node_modules/
 npm-debug.log*
 yarn-error.log*
+<<<<<<< HEAD
 
 # ---------------------------------------------------------------------------
 # Production build
@@ -85,3 +86,5 @@ build/private/
 build/work/
 build/version-info.txt
 installer/assets/hozayt.ico
+=======
+>>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57

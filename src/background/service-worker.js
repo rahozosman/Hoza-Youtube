@@ -291,10 +291,15 @@ async function openManager(section = 'active') {
 }
 
 async function openDashboard(url, title = null) {
+<<<<<<< HEAD
   // The address comes from the local app, which chooses its own port. Nothing
   // in the extension is allowed to assume one.
   const target = await local.dashboardUrl({ url });
   const tab = await api.tabs.create({ url: target });
+=======
+  const dashboardUrl = `http://127.0.0.1:8765/?url=${encodeURIComponent(url ?? '')}`;
+  const tab = await api.tabs.create({ url: dashboardUrl });
+>>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
   return { tabId: tab.id, title };
 }
 
@@ -427,6 +432,7 @@ const handlers = {
   async [MSG.SERVER_ABOUT]() {
     return local.about();
   },
+<<<<<<< HEAD
 
   /* ---- the connection itself, for any surface that shows it ---- */
 
@@ -440,6 +446,8 @@ const handlers = {
   async [MSG.RETRY_SERVER]() {
     return local.retry();
   },
+=======
+>>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
 };
 
 /** Keep the network observer's skip-list in step with per-site preferences. */
@@ -525,7 +533,10 @@ api.permissions?.onAdded?.addListener(() => {
 });
 
 api.runtime.onInstalled.addListener(() => {
+<<<<<<< HEAD
   local.wake();
+=======
+>>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
   void installContextMenus({
     openManager: () => void openManager(),
     openPanel: () => void api.action?.openPopup?.().catch(() => {}),
@@ -550,7 +561,10 @@ api.runtime.onInstalled.addListener(() => {
 });
 
 api.runtime.onStartup?.addListener(() => {
+<<<<<<< HEAD
   local.wake();
+=======
+>>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
   void queue.restore();
   void refreshDisabledOrigins();
 });
@@ -577,7 +591,10 @@ api.tabs?.onRemoved?.addListener((tabId) => registry.clearTab(tabId));
 
 // Restore immediately: the worker may have been woken by a download event
 // rather than by the user opening the panel.
+<<<<<<< HEAD
 local.wake();
+=======
+>>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
 void queue.restore();
 void refreshDisabledOrigins();
 

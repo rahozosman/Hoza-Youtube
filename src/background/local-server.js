@@ -1,4 +1,5 @@
 /**
+<<<<<<< HEAD
  * The connection to the local Hoza YT app.
  *
  * The extension does not know where the app is listening, and must not guess.
@@ -46,10 +47,29 @@ const HANDSHAKE_TIMEOUT_MS = 90000;
 /** After a genuine failure, how long before trying again. Bounded, and reset
  *  by any success or by the user asking for a retry. */
 const BACKOFF_MS = [2000, 5000, 15000, 30000, 60000];
+=======
+ * Bridge to the local Hoza YT server.
+ *
+ * The in-page panel lives in a YouTube tab, so it cannot call the local API
+ * itself: the server only accepts `chrome-extension://` and loopback origins.
+ * Every request is therefore made from here, where the origin is the
+ * extension's own.
+ *
+ * Nothing in this module throws. A local app that is not running is an
+ * ordinary, expected state, so failures come back as a record the panel can
+ * render as a sentence.
+ */
+
+const ORIGIN = 'http://127.0.0.1:8765';
+
+/** Analysis shells out to an extractor, so it is allowed to take a while. */
+const TIMEOUT_MS = { default: 8000, analyze: 45000, download: 45000 };
+>>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
 
 /** One outstanding analysis per URL, so five reopens do not extract five times. */
 const inFlight = new Map();
 
+<<<<<<< HEAD
 let state = ServerState.UNKNOWN;
 let endpoint = null;
 let problem = null;
@@ -331,6 +351,51 @@ async function attempt(target, path, { method = 'GET', body = null, timeout } = 
     const response = await fetch(`http://${target.host}:${target.port}${path}`, {
       method,
       headers: Object.keys(headers).length ? headers : undefined,
+=======
+const OFFLINE = {
+  error: 'The Hoza YT app is not running.',
+  code: 'server_offline',
+<<<<<<< HEAD
+  hint: 'It starts on its own a few seconds after the browser does. Give it a moment.',
+=======
+  hint: 'Run server/install-service.bat once and it will start with Windows and stay up on its own.',
+>>>>>>> 69b39e3a1642109c7928230fe0e05911862f162f
+  retryable: true,
+};
+
+/**
+<<<<<<< HEAD
+ * The app is started for us when the browser opens, so the very first call of
+ * a session can arrive in the second or two before it is listening. A refused
+ * connection is retried across that window instead of being reported, which is
+ * what stops an ordinary cold start from looking like a failure. Once the app
+ * has answered even once, a much shorter window is enough.
+ */
+const WAKE_MS = { cold: 15000, warm: 4000, between: 500 };
+
+let everAnswered = false;
+
+/**
+ * One call to the local API.
+ * Returns `{ ok: true, data }` or `{ ok: false, error: { error, code, hint,
+ * retryable } }` — never a rejection.
+ */
+async function attempt(path, { method = 'GET', body = null, timeout = TIMEOUT_MS.default } = {}) {
+=======
+ * Call the local API.
+ * Returns `{ ok: true, data }` or `{ ok: false, error: { error, code, hint,
+ * retryable } }` — never a rejection.
+ */
+async function request(path, { method = 'GET', body = null, timeout = TIMEOUT_MS.default } = {}) {
+>>>>>>> 69b39e3a1642109c7928230fe0e05911862f162f
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeout);
+
+  try {
+    const response = await fetch(`${ORIGIN}${path}`, {
+      method,
+      headers: body ? { 'Content-Type': 'application/json' } : undefined,
+>>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
       body: body ? JSON.stringify(body) : undefined,
       signal: controller.signal,
       cache: 'no-store',
@@ -338,9 +403,12 @@ async function attempt(target, path, { method = 'GET', body = null, timeout } = 
 
     const data = await response.json().catch(() => null);
 
+<<<<<<< HEAD
     if (response.status === 401) {
       return { ok: false, error: { error: 'stale', code: 'unauthorised', retryable: true } };
     }
+=======
+>>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
     if (!response.ok) {
       return {
         ok: false,
@@ -352,33 +420,59 @@ async function attempt(target, path, { method = 'GET', body = null, timeout } = 
               retryable: !!data.retryable,
             }
           : {
+<<<<<<< HEAD
               error: `Hoza YT reported an error (${response.status}).`,
+=======
+              error: `The local app replied with an error (${response.status}).`,
+>>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
               code: 'server_error',
               hint: 'The Logs page in the dashboard has the details.',
               retryable: true,
             },
       };
     }
+<<<<<<< HEAD
     return { ok: true, data };
   } catch (err) {
     // An abort is a timeout; anything else means nothing was listening.
+=======
+
+<<<<<<< HEAD
+    everAnswered = true;
+=======
+>>>>>>> 69b39e3a1642109c7928230fe0e05911862f162f
+    return { ok: true, data };
+  } catch (err) {
+    // An abort is a timeout here; anything else means nothing was listening.
+>>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
     if (err?.name === 'AbortError') {
       return {
         ok: false,
         error: {
+<<<<<<< HEAD
           error: 'Hoza YT did not answer in time.',
           code: 'server_timeout',
           hint: 'It may be busy with another link.',
+=======
+          error: 'The local app did not answer in time.',
+          code: 'server_timeout',
+          hint: 'It may still be starting up, or busy with another link.',
+>>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
           retryable: true,
         },
       };
     }
+<<<<<<< HEAD
     return { ok: false, error: { error: 'unreachable', code: 'server_offline', retryable: true } };
+=======
+    return { ok: false, error: { ...OFFLINE } };
+>>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
   } finally {
     clearTimeout(timer);
   }
 }
 
+<<<<<<< HEAD
 /**
  * One call to the local API.
  * Returns `{ ok: true, data }` or `{ ok: false, error: { error, code, hint,
@@ -438,6 +532,27 @@ export async function dashboardUrl(params = {}) {
   return `http://${target.host}:${target.port}/${suffix ? `?${suffix}` : ''}`;
 }
 
+=======
+<<<<<<< HEAD
+/**
+ * Call the local API, waiting out a cold start rather than reporting one.
+ * Only a refused connection is worth retrying: a timeout, or an error the app
+ * itself sent back, means something is listening and has already had its say.
+ */
+async function request(path, options = {}) {
+  const deadline = Date.now() + (everAnswered ? WAKE_MS.warm : WAKE_MS.cold);
+
+  for (;;) {
+    const result = await attempt(path, options);
+    if (result.ok || result.error.code !== 'server_offline') return result;
+    if (Date.now() >= deadline) return result;
+    await new Promise((resolve) => setTimeout(resolve, WAKE_MS.between));
+  }
+}
+
+=======
+>>>>>>> 69b39e3a1642109c7928230fe0e05911862f162f
+>>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
 /** Every quality this link offers, video and audio, with real figures. */
 export function analyze(url, { refresh = false } = {}) {
   const key = `${refresh ? 'fresh:' : ''}${url}`;

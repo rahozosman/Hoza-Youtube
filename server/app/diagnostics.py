@@ -82,7 +82,15 @@ def check_extractor() -> dict:
         return _check(
             "yt-dlp", "processing", WARN,
             f"Extractor {version} is more than four months old. Sites change often.",
+<<<<<<< HEAD
             hint="Run 'python autorun.py --update' to refresh it.",
+=======
+<<<<<<< HEAD
+            hint="Run 'python autorun.py --update' to refresh it.",
+=======
+            hint="Run update-yt-dlp.bat to refresh it.",
+>>>>>>> 69b39e3a1642109c7928230fe0e05911862f162f
+>>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
         )
     return _check("yt-dlp", "processing", PASS, f"Extractor {version} is loaded.")
 
