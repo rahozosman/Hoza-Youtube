@@ -98,8 +98,17 @@ try {
                                       -WorkingDirectory $Here
 
     # A short delay keeps it from competing with everything else at sign-in.
-    $trigger = New-ScheduledTaskTrigger -AtLogOn -User "$env:USERNAME"
-    $trigger.Delay = 'PT20S'
+    $atLogon = New-ScheduledTaskTrigger -AtLogOn -User "$env:USERNAME"
+    $atLogon.Delay = 'PT20S'
+
+    # The watchdog watches the server, and this watches the watchdog. Every ten
+    # minutes the task tries to start again; MultipleInstances IgnoreNew means
+    # that does nothing at all while the watchdog is alive, and starts it again
+    # if it ever is not. Ten years stands in for "indefinitely", which the
+    # cmdlet will not accept as a duration.
+    $repeat = New-ScheduledTaskTrigger -Once -At (Get-Date) `
+        -RepetitionInterval (New-TimeSpan -Minutes 10) `
+        -RepetitionDuration (New-TimeSpan -Days 3650)
 
     $settings = New-ScheduledTaskSettingsSet `
         -AllowStartIfOnBatteries `
@@ -117,7 +126,7 @@ try {
 
     Register-ScheduledTask -TaskName $TaskName `
                            -Action $action `
-                           -Trigger $trigger `
+                           -Trigger @($atLogon, $repeat) `
                            -Settings $settings `
                            -Principal $principal `
                            -Description 'Keeps the Hoza YT local server running.' | Out-Null
@@ -177,10 +186,12 @@ foreach ($attempt in 1..40) {
 
 Say ''
 if ($ready) {
-    Write-Host '  Done. The server is running now and will come back on its own:' -ForegroundColor Green
-    Write-Host '    - at every sign-in'
-    Write-Host '    - within ~45s if it ever crashes'
-    Write-Host '    - within ~45s if it ever hangs'
+    Write-Host '  Done. The server is running now and comes back on its own:' -ForegroundColor Green
+    Write-Host '    - within ~45s if it crashes or hangs   (the watchdog)'
+    Write-Host '    - within ~10m if the watchdog is killed (the scheduled task)'
+    Write-Host '    - at every sign-in, 20s in'
+    Write-Host ''
+    Write-Host '  You should never need to start or stop it by hand again.'
     Write-Host ''
     Write-Host '  Dashboard: http://127.0.0.1:8765/'
 } else {

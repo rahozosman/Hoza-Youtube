@@ -122,13 +122,27 @@ cannot spin the CPU, a lock file keeps two watchdogs from fighting over the
 port, and an already-running server is adopted rather than duplicated. It logs
 to `server/data/watchdog.log`, rotated at 1 MB.
 
-The scheduled task runs as you, at sign-in, with no time limit and restart-on-
-failure. **No administrator rights** — and if a policy blocks task
-registration, the installer falls back to a Startup-folder shortcut on its own.
-Nothing shows a console window: `pythonw.exe` runs the watchdog, and the
-watchdog spawns the server with `CREATE_NO_WINDOW`.
+**And something watches the watchdog.** The scheduled task carries two
+triggers: one at sign-in, and one that repeats every ten minutes forever. The
+repeating one costs nothing while the watchdog is alive — `MultipleInstances`
+is `IgnoreNew`, so the task simply declines to start a second copy — and it is
+what brings the watchdog back if the process is ever killed. The launcher waits
+on the watchdog rather than firing and forgetting, which is what keeps the task
+in the `Running` state and makes that suppression work.
 
-Worst case, from a hard kill to serving again is about 45 seconds.
+The task runs as you, at sign-in, with no time limit. **No administrator
+rights** — and if policy blocks task registration, the installer falls back to
+a Startup-folder shortcut on its own. Nothing shows a console window:
+`pythonw.exe` runs the watchdog, and the watchdog spawns the server with
+`CREATE_NO_WINDOW`.
+
+Recovery times, worst case:
+
+| What died | Back up within |
+| --- | --- |
+| the server crashed or hung | ~45 seconds |
+| the watchdog itself was killed | ~10 minutes |
+| the machine was restarted | sign-in, plus 20 seconds |
 
 ### 2. The extension
 
