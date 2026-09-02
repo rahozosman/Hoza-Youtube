@@ -1,4 +1,3 @@
-
 <h1 align="center">Hoza YT</h1>
 
 <p align="center">
@@ -16,7 +15,46 @@
 
 ---
 
+## What it looks like
 
+### On YouTube
+
+The **Hoza YT** button sits in the row with Like, Share and Save. Pressing it
+opens the panel directly underneath, without leaving the video.
+
+| Video qualities | Audio qualities |
+|---|---|
+| ![The panel on a YouTube video, listing every video quality with 1080p VP9 chosen](docs/youtube-video-qualities.png) | ![The same panel on its Audio tab, listing every track with a 152 kbps Opus track chosen](docs/youtube-audio-qualities.png) |
+
+Every line is a stream the video genuinely offers — resolution, codec,
+container and size — and the button underneath downloads exactly the one you
+picked. Nothing is re-encoded, and no quality is invented.
+
+| The button in the action row | The Dashboard section |
+|---|---|
+| ![The Hoza YT button beside Share and Save, with the quality panel open beneath it](docs/youtube-panel.png) | ![The panel's Dashboard section, offering to open the main dashboard](docs/youtube-dashboard-tab.png) |
+
+### The dashboard
+
+The local app serves its own dashboard at `127.0.0.1:8765`. The panel's
+Dashboard section opens it with the video already loaded.
+
+| Paste a link and analyse it | Every quality the link offers |
+|---|---|
+| ![The Download page: a pasted YouTube link, the media card, and the Smart Quality presets](docs/dashboard-download.png) | ![The same page scrolled down, showing all 28 video streams as a grid](docs/dashboard-all-qualities.png) |
+
+| The dashboard in the browser | History |
+|---|---|
+| ![The Download page at 127.0.0.1:8765, with stream counts, subtitles and upload date](docs/dashboard-analyse.png) | ![The History page: records, completed, failed and total size, over a table of finished downloads](docs/dashboard-history.png) |
+
+| Settings | Servers |
+|---|---|
+| ![Settings: download folder, default media type and quality, and the filename template](docs/dashboard-settings.png) | ![The Servers page: backend health, adding a second machine, and failover options](docs/dashboard-servers.png) |
+
+![The About page: version, developer, bundled ffmpeg and Python versions, and what the application will not do](docs/dashboard-about.png)
+
+> Some of these were taken before the rename, so the interface in them still
+> says **HOZA Download**. It is the same application.
 
 ---
 
@@ -177,7 +215,7 @@ ffmpeg.
 
 ```
 manifest.json                 MV3 manifest — no host permissions but the local app
-docs/                         Demo recording and poster frame
+docs/                         The screenshots used by this README
 
 src/                          The extension
   core/                       Pure logic, no browser APIs
@@ -407,7 +445,3 @@ in the About section instead.
 Hoza YT is for media you are authorised to download. Respect the terms of the
 sites you visit and the rights of the people who made what you are saving. The
 protection boundaries above are not configurable.
-=======
-# youtube-extention
-Hoza is a fast, simple YouTube video downloader that lets you save videos and audio in multiple quality options. Choose your preferred format and quality, download quickly, and enjoy a clean, modern experience designed for easy and convenient media saving.
->>>>>>> fb4500c5ecd3346995d97cbb28bf66642ef70c84
