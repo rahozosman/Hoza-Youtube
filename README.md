@@ -16,14 +16,7 @@
 
 ---
 
-## Demo
 
-<video src="docs/demo.mp4" poster="docs/preview.png" controls muted playsinline width="100%"></video>
-
-[![Hoza YT in action](docs/preview.png)](docs/demo.mp4)
-
-**▶ [Watch the demo (47s)](docs/demo.mp4)** — the button on a YouTube page, the
-quality panel, and the dashboard behind it.
 
 > GitHub does not always play a repository-hosted `.mp4` inline. If the player
 > above is not interactive, the image is a link to the file. To get a real
