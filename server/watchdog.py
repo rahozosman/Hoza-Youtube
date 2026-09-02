@@ -228,6 +228,12 @@ def spawn(host: str, port: int) -> subprocess.Popen | None:
     except OSError as err:
         log(f"Could not start the server: {err}")
         return None
+    finally:
+        # The child holds its own duplicate of the handle, so this one has done
+        # its job. Left open, every restart would leak one for the life of a
+        # process that is meant to run for months.
+        if sink is not subprocess.DEVNULL:
+            sink.close()
 
 
 def wait_until_healthy(host: str, port: int, seconds: int) -> bool:
