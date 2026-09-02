@@ -564,8 +564,14 @@ async def add_server(entry: ServerEntry):
     existing = cfg["network"]["servers"]
     if any(s.get("name") == entry.name for s in existing):
         raise fail(409, f"A server named {entry.name} already exists.", "duplicate")
-    if entry.name == "local":
-        raise fail(400, "The name 'local' is reserved for this machine.", "reserved_name")
+    if entry.name in servers.BUILT_IN:
+        raise fail(
+            400,
+            f"The name '{entry.name}' belongs to a built-in server.",
+            "reserved_name",
+            "Give this one a different name. To point the GitHub server "
+            "somewhere, set its address on the Servers page instead.",
+        )
     existing.append({"name": entry.name, "url": url, "role": entry.role, "token": entry.token})
     config.save({"network": {"servers": existing}})
     servers.refresh_config()
@@ -576,8 +582,17 @@ async def add_server(entry: ServerEntry):
 
 @app.delete("/api/servers/{name}")
 async def remove_server(name: str):
-    if name == "local":
-        raise fail(400, "This machine cannot be removed.", "reserved_name")
+    if name in servers.BUILT_IN:
+        raise fail(
+            400,
+            "This machine cannot be removed."
+            if name == servers.LOCAL
+            else "The GitHub server is built in and cannot be removed.",
+            "reserved_name",
+            None
+            if name == servers.LOCAL
+            else "Clear its address instead if you do not want it used.",
+        )
     cfg = config.load()
     remaining = [s for s in cfg["network"]["servers"] if s.get("name") != name]
     if len(remaining) == len(cfg["network"]["servers"]):

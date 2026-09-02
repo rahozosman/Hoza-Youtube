@@ -87,6 +87,7 @@ DEFAULTS: dict[str, dict[str, Any]] = {
     },
     "network": {
         "servers": [],                # list of {name, url, role, token}
+        "github_url": "",             # the built-in GitHub entry; "" = not set
         "health_interval": 30,
         "request_timeout": 15,
         "retry_delay": 3,

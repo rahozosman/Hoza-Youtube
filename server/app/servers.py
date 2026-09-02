@@ -29,6 +29,13 @@ DEGRADED = "degraded"
 OFFLINE = "offline"
 UNKNOWN = "unknown"
 
+# Built-in entries. Both are always in the registry and neither can be removed:
+# "local" is this machine, and "github" is the slot for the GitHub-hosted
+# instance. Their addresses come from configuration, never from the server list.
+LOCAL = "local"
+GITHUB = "github"
+BUILT_IN = (LOCAL, GITHUB)
+
 # Consecutive failures before a server stops receiving work.
 FAILURE_THRESHOLD = 2
 # How long an unhealthy server is skipped before it is retried.
@@ -57,6 +64,9 @@ class Server:
     role: str = "api+worker"
     token: str | None = None
     is_local: bool = False
+    # Built-in entries are permanent. The dashboard hides Remove for them and
+    # the API refuses to delete them.
+    built_in: bool = False
 
     status: str = UNKNOWN
     latency_ms: float | None = None
@@ -70,6 +80,10 @@ class Server:
     def healthy(self) -> bool:
         if self.is_local:
             return True
+        # A built-in entry waiting for an address is shown, but is not somewhere
+        # a job can be sent.
+        if not self.url:
+            return False
         if time.time() < self.unhealthy_until:
             return False
         return self.status in (ONLINE, DEGRADED)
@@ -80,6 +94,8 @@ class Server:
             "url": self.url,
             "role": self.role,
             "is_local": self.is_local,
+            "built_in": self.built_in,
+            "configured": bool(self.url),
             "status": self.status,
             "latency_ms": round(self.latency_ms, 1) if self.latency_ms is not None else None,
             "last_check": self.last_check,
@@ -146,18 +162,40 @@ def _build_registry() -> None:
     with _lock:
         previous = dict(_registry)
         _registry.clear()
-        local = previous.get("local") or Server(
-            name="local",
+        local = previous.get(LOCAL) or Server(
+            name=LOCAL,
             url=f"http://127.0.0.1:{_port}",
             role="api+worker",
             is_local=True,
+            built_in=True,
         )
         local.url = f"http://127.0.0.1:{_port}"
+        local.built_in = True
         local.status = ONLINE
         local.latency_ms = 0.0
         local.last_check = time.time()
         local.metrics = local_metrics()
-        _registry["local"] = local
+        _registry[LOCAL] = local
+
+        # The GitHub entry is permanent in the same way, but unlike local it
+        # starts with no address. Until one is set it sits in the list saying
+        # so, rather than pretending to be a server that is merely offline.
+        github = previous.get(GITHUB) or Server(name=GITHUB, url="", built_in=True)
+        github.built_in = True
+        github.url = ""
+        raw = str(cfg.get("github_url") or "").strip()
+        if raw:
+            try:
+                github.url = validate_server_url(raw)
+            except ValidationError as exc:
+                logs.warning("network", f"Ignoring the GitHub server address: {exc}")
+        if not github.url:
+            github.status = UNKNOWN
+            github.latency_ms = None
+            github.error = None
+            github.failures = 0
+            github.unhealthy_until = 0.0
+        _registry[GITHUB] = github
 
         for index, entry in enumerate(cfg["servers"], start=1):
             if not isinstance(entry, dict) or not entry.get("url"):
@@ -168,7 +206,7 @@ def _build_registry() -> None:
                 logs.warning("network", f"Ignoring server entry: {exc}")
                 continue
             name = str(entry.get("name") or f"server-{index}").strip() or f"server-{index}"
-            if name == "local":
+            if name in BUILT_IN:
                 name = f"{name}-{index}"
             existing = previous.get(name)
             server = existing or Server(name=name, url=url)
@@ -212,6 +250,16 @@ def check(server: Server) -> Server:
         server.error = None
         server.failures = 0
         server.metrics = local_metrics()
+        return server
+
+    if not server.url:
+        # A built-in entry nobody has given an address to. Not offline: there is
+        # simply nothing to ask.
+        server.status = UNKNOWN
+        server.latency_ms = None
+        server.last_check = time.time()
+        server.error = None
+        server.failures = 0
         return server
 
     timeout = config.load()["network"]["request_timeout"]

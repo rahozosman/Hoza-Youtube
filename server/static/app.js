@@ -1153,6 +1153,53 @@
 
   // --------------------------------------------------------------- servers --
 
+  /**
+   * Inline address editor for a built-in server.
+   *
+   * It writes through the settings API rather than the server list, because a
+   * built-in entry is not in that list: its address is a setting, which is what
+   * lets the entry survive with no address and never be deleted by accident.
+   */
+  function addressEditor(server, node, trigger) {
+    trigger.disabled = true;
+
+    const row = el("div", "job-line");
+    const input = el("input");
+    input.type = "text";
+    input.value = server.url || "";
+    input.placeholder = "https://your-instance.example.com";
+    input.style.flex = "1";
+    input.spellcheck = false;
+
+    const save = el("button", "btn sm", "Save");
+    const cancel = el("button", "btn ghost sm", "Cancel");
+
+    const commit = async () => {
+      save.disabled = true;
+      const address = input.value.trim();
+      try {
+        await api("settings", { method: "PUT", body: { network: { github_url: address } } });
+        toast(address ? "Address saved" : "Address cleared", server.name);
+        loadServers(Boolean(address));
+      } catch (error) {
+        save.disabled = false;
+        reportError(error);
+      }
+    };
+
+    save.onclick = commit;
+    cancel.onclick = () => loadServers();
+    input.onkeydown = (event) => {
+      if (event.key === "Enter") commit();
+      if (event.key === "Escape") cancel.onclick();
+    };
+
+    row.append(input, save, cancel);
+    node.appendChild(row);
+    input.focus();
+    input.select();
+  }
+
   function serverNode(server) {
     const node = el("div", "job");
     node.style.gridTemplateColumns = "1fr";
@@ -1163,12 +1210,24 @@
       : server.status === "offline" ? "err" : "";
     head.appendChild(el("span", `pill ${kind}`, server.status));
     if (server.is_local) head.appendChild(el("span", "pill", "this machine"));
+    else if (server.built_in) head.appendChild(el("span", "pill", "built in"));
     head.appendChild(el("span", "pill", server.role));
-    if (!server.accepting_jobs && !server.is_local) {
+    if (!server.configured) {
+      head.appendChild(el("span", "pill", "no address"));
+    } else if (!server.accepting_jobs && !server.is_local) {
       head.appendChild(el("span", "pill err", `cooling down ${server.cooldown_remaining}s`));
     }
-    if (!server.is_local) {
-      const actions = el("div", "job-actions");
+
+    const actions = el("div", "job-actions");
+    // Built-in servers keep their place in the list. The GitHub one is the only
+    // one whose address is worth editing here: local always points at us.
+    if (server.built_in && !server.is_local) {
+      const edit = el("button", "btn ghost sm",
+        server.configured ? "Change address" : "Set address");
+      edit.onclick = () => addressEditor(server, node, edit);
+      actions.appendChild(edit);
+    }
+    if (!server.built_in) {
       const remove = el("button", "btn danger sm", "Remove");
       remove.onclick = async () => {
         try {
@@ -1180,10 +1239,11 @@
         }
       };
       actions.appendChild(remove);
-      head.appendChild(actions);
     }
+    if (actions.childNodes.length) head.appendChild(actions);
+
     node.appendChild(head);
-    node.appendChild(el("div", "muted mono", server.url));
+    node.appendChild(el("div", "muted mono", server.url || "No address set yet."));
 
     const metrics = server.metrics || {};
     const facts = el("div", "job-facts");
