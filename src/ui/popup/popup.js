@@ -71,7 +71,6 @@ function isYouTubeUrl(url) {
 }
 
 function openYouTubeServer() {
-<<<<<<< HEAD
   // The local app chooses its own port, so the background worker opens the
   // dashboard rather than the popup guessing an address.
   void chrome.runtime.sendMessage({
@@ -79,10 +78,6 @@ function openYouTubeServer() {
     url: state.tab?.url ?? '',
     title: state.tab?.title ?? null,
   });
-=======
-  const target = `http://127.0.0.1:8765/?url=${encodeURIComponent(state.tab?.url ?? '')}`;
-  void chrome.tabs.create({ url: target });
->>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
   window.close();
 }
 
@@ -809,25 +804,64 @@ async function refreshQueue() {
   }
 }
 
-<<<<<<< HEAD
 /* ---------------------------------------------------------- engine state
  *
- * One line, and only while the local app is not simply working. Nothing here
- * ever asks the user to start a server, install a runtime or open a terminal:
- * the app was installed with the extension and starts itself.
+ * Two surfaces, from one report. The footer line is the quiet one and says
+ * only what the connection is doing. The notice above the body is the loud
+ * one, and appears only when the person has to do something about it.
+ *
+ * A packaged install starts the app itself, so the only state that ever asks
+ * is the unpacked one: without an installer there is no native host, nothing
+ * can launch the app on our behalf, and the extension has to say so plainly
+ * rather than sit at "unavailable" and let it look broken.
  */
+
+/** Copy for the notice, by state. Null means the state is not worth a notice. */
+function noticeFor(report) {
+  if (report.ready) return null;
+
+  if (report.state === 'not-installed' || report.state === 'unavailable') {
+    return {
+      title: 'The Hoza YT app is not running',
+      body:
+        'Downloads from YouTube run through the Hoza YT app on this computer. '
+        + 'Install it, or open Hoza YT from the Start menu, then press Try again.',
+      showActions: true,
+    };
+  }
+
+  // Starting, connecting, reconnecting: it is coming. Say so, ask for nothing.
+  return {
+    title: report.text ?? 'Connecting to the Hoza YT app',
+    body: report.hint ?? 'This takes a few seconds the first time.',
+    showActions: false,
+  };
+}
 
 function paintEngineState(report) {
   const row = $('#engine-state');
-  if (!row || !report?.state) return;
-  if (report.ready) {
-    row.hidden = true;
+  if (row && report?.state) {
+    row.hidden = !!report.ready;
+    row.dataset.state = report.state;
+    $('#engine-text').textContent = report.text ?? '';
+    row.title = report.hint ? `${report.error ?? report.text} ${report.hint}` : '';
+  }
+
+  const notice = $('#app-notice');
+  if (!notice || !report?.state) return;
+
+  const copy = noticeFor(report);
+  if (!copy) {
+    notice.hidden = true;
     return;
   }
-  row.hidden = false;
-  row.dataset.state = report.state;
-  $('#engine-text').textContent = report.text ?? '';
-  row.title = report.hint ? `${report.error ?? report.text} ${report.hint}` : '';
+
+  notice.hidden = false;
+  notice.dataset.state = report.state;
+  $('#app-notice-title').textContent = copy.title;
+  $('#app-notice-body').textContent = copy.body;
+  $('#app-notice-retry').hidden = !copy.showActions;
+  $('#app-notice-help').hidden = !copy.showActions;
 }
 
 async function loadEngineState() {
@@ -835,8 +869,23 @@ async function loadEngineState() {
   if (report) paintEngineState(report);
 }
 
-=======
->>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
+/** Re-negotiate now, ignoring any backoff, and show the outcome. */
+async function retryApp() {
+  const button = $('#app-notice-retry');
+  const label = button.textContent;
+  button.disabled = true;
+  button.textContent = 'Checking…';
+  try {
+    const report = await request(MSG.RETRY_SERVER).catch(() => null);
+    if (report) paintEngineState(report);
+    // A connection that just came up may unblock the analysis that failed.
+    if (report?.ready) await loadState({ scan: false });
+  } finally {
+    button.disabled = false;
+    button.textContent = label;
+  }
+}
+
 /* ------------------------------------------------------------------- boot */
 
 async function init() {
@@ -847,6 +896,12 @@ async function init() {
   $('#open-settings').append(icon(ICONS.settings, { size: 15 }));
   const youtubeServer = $('#open-youtube-server');
   youtubeServer.append(icon(ICONS.external, { size: 15 }));
+
+  $('#app-notice-retry').addEventListener('click', () => void retryApp());
+  $('#app-notice-help').addEventListener('click', () => {
+    void chrome.tabs.create({ url: chrome.runtime.getURL('src/ui/welcome/welcome.html') });
+    window.close();
+  });
 
   $('#rescan').addEventListener('click', () => void rescan());
   $('#open-settings').addEventListener('click', openSettings);
@@ -861,12 +916,9 @@ async function init() {
     return;
   }
 
-<<<<<<< HEAD
   subscribe(MSG.SERVER_STATE, (message) => paintEngineState(message));
   void loadEngineState();
 
-=======
->>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
   subscribe(MSG.JOBS_CHANGED, () => void refreshQueue());
   subscribe(MSG.MEDIA_CHANGED, (message) => {
     if (message.tabId === state.tab.id && !state.streams.length) {

@@ -119,7 +119,6 @@ def set_port(port: int) -> None:
     _port = port
 
 
-<<<<<<< HEAD
 def current_port() -> int:
     """The port this instance is serving on.
 
@@ -130,8 +129,6 @@ def current_port() -> int:
     return _port
 
 
-=======
->>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
 def local_metrics() -> dict[str, Any]:
     """Real resource figures for this machine."""
     out: dict[str, Any] = {}

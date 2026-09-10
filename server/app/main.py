@@ -8,10 +8,7 @@ the dashboard does not poll while downloads run.
 from __future__ import annotations
 
 import asyncio
-<<<<<<< HEAD
 import html
-=======
->>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
 import json
 import os
 import subprocess
@@ -24,22 +21,14 @@ from typing import Any
 
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
-<<<<<<< HEAD
 from fastapi.responses import (
     FileResponse, HTMLResponse, JSONResponse, PlainTextResponse, StreamingResponse,
 )
-=======
-from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse, StreamingResponse
->>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
 
 from . import (
     APP_NAME, DEVELOPER, DEVELOPER_EMAIL, __version__,
     analyzer, config, db, diagnostics, downloader, extension, ffmpeg as ffmpeg_mod,
-<<<<<<< HEAD
     formats, jobs as jobs_mod, logs, paths, servers, session, updates,
-=======
-    formats, jobs as jobs_mod, logs, paths, servers, updates,
->>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
 )
 from .analyzer import AnalysisError
 from .formats import SelectionError
@@ -52,14 +41,11 @@ from .security import ValidationError, contain, validate_server_url
 MAX_BODY_BYTES = 256 * 1024
 START_TIME = time.time()
 
-<<<<<<< HEAD
 # What /api/health says it is. `APP_NAME` is for people and can be translated
 # or rebranded; this identifier is for the supervisor deciding whether the
 # process already on port 8765 is ours to adopt, and never changes.
 APP_ID = "hoza-yt"
 
-=======
->>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
 # The dashboard is served from disk and updated in place, so a browser holding
 # an old copy shows a page that no longer matches the API behind it. "no-cache"
 # does not mean "do not store": it means revalidate every time, and the ETag
@@ -171,7 +157,6 @@ async def guard(request: Request, call_next):
             )
         bucket.append(now)
 
-<<<<<<< HEAD
     # The session token. Set only in a packaged installation, where the
     # extension is handed it over native messaging and the dashboard has it
     # injected into the page this server serves. A development server sets no
@@ -187,8 +172,6 @@ async def guard(request: Request, call_next):
             status_code=401,
         )
 
-=======
->>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
     try:
         return await call_next(request)
     except Exception as exc:  # noqa: BLE001
@@ -224,7 +207,6 @@ async def http_error(request: Request, exc: HTTPException):
 # Static dashboard
 # --------------------------------------------------------------------------- #
 
-<<<<<<< HEAD
 def _dashboard_html() -> str | None:
     """index.html, with the session token added when there is one.
 
@@ -252,14 +234,6 @@ async def index():
     if document is None:
         return PlainTextResponse("Dashboard files are missing from server/static.", 500)
     return HTMLResponse(document, headers=NO_CACHE)
-=======
-@app.get("/", include_in_schema=False)
-async def index():
-    target = paths.STATIC_DIR / "index.html"
-    if not target.exists():
-        return PlainTextResponse("Dashboard files are missing from server/static.", 500)
-    return FileResponse(target, media_type="text/html", headers=NO_CACHE)
->>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
 
 
 @app.get("/static/{filename:path}", include_in_schema=False)
@@ -286,7 +260,6 @@ async def favicon():
 # --------------------------------------------------------------------------- #
 
 @app.get("/api/health")
-<<<<<<< HEAD
 async def health(request: Request):
     """Whether this process is alive, and enough to decide what to do next.
 
@@ -322,21 +295,6 @@ async def health(request: Request):
         "extension_seen": bool(extension.status().get("connected")),
     })
     return payload
-=======
-async def health():
-    stats = jobs_mod.queue.stats()
-    info = ffmpeg_mod.probe()
-    degraded = not info.available
-    return {
-        "status": "degraded" if degraded else "online",
-        "app": APP_NAME,
-        "version": __version__,
-        "uptime_seconds": round(time.time() - START_TIME, 1),
-        "queue": stats,
-        "ffmpeg": info.available,
-        "metrics": servers.local_metrics(),
-    }
->>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
 
 
 @app.get("/api/updates")
@@ -791,7 +749,6 @@ async def take_handoff():
 
 
 # --------------------------------------------------------------------------- #
-<<<<<<< HEAD
 # Setup
 #
 # Everything a desktop installer is allowed to do, it has already done by the
@@ -905,8 +862,6 @@ async def setup_reveal_extension():
 
 
 # --------------------------------------------------------------------------- #
-=======
->>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
 # System actions
 # --------------------------------------------------------------------------- #
 

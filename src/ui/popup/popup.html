@@ -38,6 +38,22 @@
       </div>
     </header>
 
+    <!-- Shown only while the local Hoza YT app is not answering. The extension
+         detects and downloads on its own, so this warns rather than blocks. -->
+    <div id="app-notice" class="app-notice" role="status" hidden>
+      <div class="app-notice-head">
+        <span class="app-notice-icon" aria-hidden="true"></span>
+        <div class="app-notice-text">
+          <p class="app-notice-title" id="app-notice-title"></p>
+          <p class="app-notice-body" id="app-notice-body"></p>
+        </div>
+      </div>
+      <div class="app-notice-actions">
+        <button id="app-notice-retry" class="btn btn-primary btn-sm" type="button">Try again</button>
+        <button id="app-notice-help" class="btn btn-ghost btn-sm" type="button">How to start it</button>
+      </div>
+    </div>
+
     <main id="body" class="pop-body">
       <!-- Detection states, media card and quality picker are rendered here. -->
       <div class="state">
@@ -52,13 +68,10 @@
         <span id="manager-label">Downloads</span>
       </button>
       <div id="queue-summary" class="queue-summary faint"></div>
-<<<<<<< HEAD
       <div id="engine-state" class="engine-state faint" hidden>
         <span class="engine-dot"></span>
         <span id="engine-text"></span>
       </div>
-=======
->>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
     </footer>
 
     <script type="module" src="popup.js"></script>

@@ -32,7 +32,6 @@
 
   // ------------------------------------------------------------------ api --
 
-<<<<<<< HEAD
   /* The session token of a packaged installation. It is delivered in the
      document this backend served, which is the one place a page from another
      origin cannot read. A development server sends no token and asks for
@@ -49,10 +48,6 @@
   async function api(path, options = {}) {
     const config = { ...options, headers: { ...(options.headers || {}) } };
     if (TOKEN) config.headers["X-Hoza-Token"] = TOKEN;
-=======
-  async function api(path, options = {}) {
-    const config = { headers: {}, ...options };
->>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
     if (config.body !== undefined && typeof config.body !== "string") {
       config.headers["Content-Type"] = "application/json";
       config.body = JSON.stringify(config.body);
@@ -1013,11 +1008,7 @@
 
   function connectEvents() {
     if (state.events) state.events.close();
-<<<<<<< HEAD
     const source = new EventSource(withToken("/api/events"));
-=======
-    const source = new EventSource("/api/events");
->>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
     state.events = source;
     source.onopen = () => setConnected(true);
     source.onerror = () => {

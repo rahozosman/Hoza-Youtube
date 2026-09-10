@@ -40,21 +40,15 @@ export const MSG = {
   SERVER_JOBS: 'hoza:jobs',
   SERVER_ABOUT: 'hoza:about',
 
-<<<<<<< HEAD
   // the local app's connection, for any surface that shows it
   GET_SERVER_STATE: 'hoza:state:get',
   RETRY_SERVER: 'hoza:state:retry',
 
-=======
->>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
   // background -> UI broadcast
   JOBS_CHANGED: 'jobs:changed',
   MEDIA_CHANGED: 'media:changed',
   DUPLICATE_PROMPT: 'download:duplicate:prompt',
-<<<<<<< HEAD
   SERVER_STATE: 'hoza:state:changed',
-=======
->>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
 
   // background <-> offscreen
   OFFSCREEN_ASSEMBLE: 'offscreen:assemble',
@@ -120,7 +114,6 @@ export const DetectState = {
   UNSUPPORTED_PAGE: 'unsupported-page',
 };
 
-<<<<<<< HEAD
 /**
  * The local app's connection, as the user sees it.
  *
@@ -149,8 +142,6 @@ export const SERVER_STATE_TEXT = {
   [ServerState.NOT_INSTALLED]: 'Hoza YT is not installed on this computer',
 };
 
-=======
->>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
 /** Video containers we can name confidently. */
 export const CONTAINERS = ['mp4', 'webm', 'mkv', 'ts', 'm4a', 'mp3', 'ogg', 'opus', 'wav', 'flac', 'aac', 'm4s'];
 

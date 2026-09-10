@@ -44,7 +44,6 @@ env/
 # Packaged builds
 # ---------------------------------------------------------------------------
 dist/
-build/
 *.zip
 *.crx
 *.pem
@@ -73,7 +72,6 @@ Desktop.ini
 node_modules/
 npm-debug.log*
 yarn-error.log*
-<<<<<<< HEAD
 
 # ---------------------------------------------------------------------------
 # Production build
@@ -82,9 +80,9 @@ yarn-error.log*
 # key lives in manifest.json, so a checkout without this file still builds an
 # extension with the same id. It must never be committed.
 # ---------------------------------------------------------------------------
+# `build/` itself is deliberately NOT ignored: build.py and release.py are the
+# build system, not its output. Only the three things below are generated.
 build/private/
 build/work/
 build/version-info.txt
 installer/assets/hozayt.ico
-=======
->>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57

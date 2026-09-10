@@ -291,15 +291,10 @@ async function openManager(section = 'active') {
 }
 
 async function openDashboard(url, title = null) {
-<<<<<<< HEAD
   // The address comes from the local app, which chooses its own port. Nothing
   // in the extension is allowed to assume one.
   const target = await local.dashboardUrl({ url });
   const tab = await api.tabs.create({ url: target });
-=======
-  const dashboardUrl = `http://127.0.0.1:8765/?url=${encodeURIComponent(url ?? '')}`;
-  const tab = await api.tabs.create({ url: dashboardUrl });
->>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
   return { tabId: tab.id, title };
 }
 
@@ -432,7 +427,6 @@ const handlers = {
   async [MSG.SERVER_ABOUT]() {
     return local.about();
   },
-<<<<<<< HEAD
 
   /* ---- the connection itself, for any surface that shows it ---- */
 
@@ -446,8 +440,6 @@ const handlers = {
   async [MSG.RETRY_SERVER]() {
     return local.retry();
   },
-=======
->>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
 };
 
 /** Keep the network observer's skip-list in step with per-site preferences. */
@@ -532,11 +524,37 @@ api.permissions?.onAdded?.addListener(() => {
   void refreshDisabledOrigins();
 });
 
-api.runtime.onInstalled.addListener(() => {
-<<<<<<< HEAD
+/**
+ * The setup page, on a fresh install and only when it has something to say.
+ *
+ * A packaged install registers a native host and the app starts itself the
+ * first time anything asks; that reader needs no page about running an exe.
+ * An unpacked install has no host behind it, so nothing starts the app unless
+ * a person does — and that reader is otherwise left with a panel that reports
+ * "unavailable" and no idea why.
+ *
+ * The declared permission cannot tell the two apart: `connectNative` is a
+ * function whenever `nativeMessaging` is granted, registered host or not. So
+ * ask the connection how it actually went. `retry` runs the full handshake and
+ * resolves either way, which means a slow but genuine cold start is waited out
+ * rather than papered over with a page the person did not need.
+ */
+async function openSetupIfNeeded(reason) {
+  if (reason !== 'install') return;
+
+  const report = await local.retry().catch(() => null);
+  if (report?.ready) return;
+
+  try {
+    await api.tabs.create({ url: api.runtime.getURL('src/ui/welcome/welcome.html') });
+  } catch {
+    // A browser that will not open a tab here is not worth failing install over.
+  }
+}
+
+api.runtime.onInstalled.addListener((details) => {
   local.wake();
-=======
->>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
+  void openSetupIfNeeded(details?.reason);
   void installContextMenus({
     openManager: () => void openManager(),
     openPanel: () => void api.action?.openPopup?.().catch(() => {}),
@@ -561,10 +579,7 @@ api.runtime.onInstalled.addListener(() => {
 });
 
 api.runtime.onStartup?.addListener(() => {
-<<<<<<< HEAD
   local.wake();
-=======
->>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
   void queue.restore();
   void refreshDisabledOrigins();
 });
@@ -591,10 +606,7 @@ api.tabs?.onRemoved?.addListener((tabId) => registry.clearTab(tabId));
 
 // Restore immediately: the worker may have been woken by a download event
 // rather than by the user opening the panel.
-<<<<<<< HEAD
 local.wake();
-=======
->>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
 void queue.restore();
 void refreshDisabledOrigins();
 

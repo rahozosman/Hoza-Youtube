@@ -13,6 +13,10 @@ access controls. Only download media that you are authorized to save.
 ![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-4c8dff)
 ![License](https://img.shields.io/badge/data-local-34d399)
 
+> **New here?** [PROJECT-MAP.md](PROJECT-MAP.md) splits the project into the
+> three things it actually is: the app the user installs, the extension they
+> load into Chrome, and everything neither of them should touch.
+
 ## Features
 
 - YouTube panel with separate video and audio quality lists.

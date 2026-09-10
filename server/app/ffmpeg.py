@@ -95,7 +95,6 @@ def _run(args: list[str], timeout: int = 20) -> subprocess.CompletedProcess:
 
 
 def _locate() -> tuple[str | None, str]:
-<<<<<<< HEAD
     # A packaged installation ships its own build and names it here. It wins,
     # because the alternative is a product whose capabilities depend on which
     # unrelated program last put an ffmpeg on this machine's PATH.
@@ -105,8 +104,6 @@ def _locate() -> tuple[str | None, str]:
     if declared and os.path.isfile(declared):
         return declared, "bundled"
 
-=======
->>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
     on_path = shutil.which("ffmpeg")
     if on_path:
         return on_path, "path"

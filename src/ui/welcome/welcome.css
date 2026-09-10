@@ -1,0 +1,136 @@
+/* The setup page, shown once when the extension is first loaded.
+   It has one job: get the app running, and say so when it is. */
+
+.welcome {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg-page);
+  color: var(--text);
+  display: flex;
+  justify-content: center;
+  padding: var(--space-6, 32px) var(--space-4);
+}
+
+.sheet {
+  width: 100%;
+  max-width: 640px;
+}
+
+.sheet-head {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  margin-bottom: var(--space-4);
+}
+
+.sheet-head h1 {
+  margin: 0;
+  font-size: 22px;
+  line-height: 1.2;
+}
+
+.lede {
+  margin: 4px 0 0;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+/* ------------------------------------------------------------------ status */
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--surface-solid);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--space-5, 24px);
+}
+
+.status > div { flex: 1; min-width: 0; }
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex: none;
+  background: var(--text-faint);
+}
+
+.status[data-state="waiting"] { border-color: var(--warning); background: var(--warning-soft); }
+.status[data-state="waiting"] .status-dot { background: var(--warning); }
+
+.status[data-state="connecting"] .status-dot {
+  background: var(--accent);
+  animation: status-pulse 1.6s ease-in-out infinite;
+}
+
+.status[data-state="ready"] { border-color: var(--success); background: var(--success-soft); }
+.status[data-state="ready"] .status-dot { background: var(--success); animation: none; }
+
+.status-title { margin: 0; font-size: 14px; font-weight: 600; }
+.status-body { margin: 2px 0 0; font-size: 12px; color: var(--text-muted); }
+
+@keyframes status-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* ------------------------------------------------------------------- steps */
+
+.steps h2 { margin: 0 0 var(--space-2); font-size: 15px; }
+
+.note {
+  margin: 0 0 var(--space-4);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+.steps ol {
+  margin: 0;
+  padding: 0 0 0 var(--space-5, 24px);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.steps li h3 { margin: 0 0 2px; font-size: 13px; font-weight: 600; }
+.steps li p { margin: 0; font-size: 13px; line-height: 1.55; color: var(--text-muted); }
+
+code {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.92em;
+  padding: 1px 5px;
+  border-radius: var(--radius-xs);
+  background: var(--surface-sunken);
+}
+
+details {
+  margin-top: var(--space-4);
+  padding: var(--space-3);
+  border: 1px solid var(--border-faint);
+  border-radius: var(--radius-sm);
+  background: var(--surface-sunken);
+}
+
+summary { cursor: pointer; font-size: 13px; font-weight: 500; }
+details p { margin: var(--space-2) 0 0; font-size: 12px; line-height: 1.6; color: var(--text-muted); }
+
+.sheet-foot {
+  margin-top: var(--space-6, 32px);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--border-faint);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.sheet-foot .faint { margin: 0; font-size: 12px; color: var(--text-faint); }
+
+@media (prefers-reduced-motion: reduce) {
+  .status-dot { animation: none; }
+}

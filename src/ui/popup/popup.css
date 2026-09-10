@@ -422,7 +422,6 @@ details.advanced[open] > summary .icon { transform: rotate(180deg); }
 }
 
 .sheet-actions .btn-wide { grid-column: 1 / -1; }
-<<<<<<< HEAD
 
 /* ---------------------------------------------------------- engine state
  *
@@ -463,5 +462,91 @@ details.advanced[open] > summary .icon { transform: rotate(180deg); }
 @media (prefers-reduced-motion: reduce) {
   .engine-dot { animation: none; }
 }
-=======
->>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
+
+/* ------------------------------------------------------------- app notice
+ *
+ * The one place the panel is allowed to ask for something. Everything else
+ * here reports; this asks the person to start the app, because on an unpacked
+ * install nothing else can — there is no installer to have registered a native
+ * host, so the app will not start itself.
+ */
+
+.app-notice {
+  /* A sibling of the scrolling body, which is flex:1 — without this the
+     notice is the part that gets squeezed when the list is long. */
+  flex: none;
+  margin: var(--space-3) var(--space-3) 0;
+  padding: var(--space-3);
+  border: 1px solid var(--warning);
+  border-radius: var(--radius-md);
+  background: var(--warning-soft);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.app-notice[data-state="not-installed"] {
+  border-color: var(--danger);
+  background: var(--danger-soft);
+}
+
+.app-notice[data-state="starting"],
+.app-notice[data-state="connecting"],
+.app-notice[data-state="reconnecting"] {
+  border-color: var(--border-strong);
+  background: var(--surface-sunken);
+}
+
+.app-notice-head {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-start;
+}
+
+.app-notice-icon {
+  width: 8px;
+  height: 8px;
+  margin-top: 5px;
+  border-radius: 50%;
+  flex: none;
+  background: var(--warning);
+}
+
+.app-notice[data-state="not-installed"] .app-notice-icon {
+  background: var(--danger);
+}
+
+.app-notice[data-state="starting"] .app-notice-icon,
+.app-notice[data-state="connecting"] .app-notice-icon,
+.app-notice[data-state="reconnecting"] .app-notice-icon {
+  background: var(--accent);
+  animation: engine-pulse 1.6s ease-in-out infinite;
+}
+
+.app-notice-text {
+  min-width: 0;
+}
+
+.app-notice-title {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.app-notice-body {
+  margin: 2px 0 0;
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+
+.app-notice-actions {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-notice-icon { animation: none; }
+}

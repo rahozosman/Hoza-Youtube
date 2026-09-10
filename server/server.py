@@ -51,26 +51,6 @@ def _port_free(host: str, port: int) -> bool:
             return False
 
 
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
-def _bootstrap(host: str, port: int) -> None:
-    """Hand off to autorun, which decides whether there is anything to do."""
-    try:
-        import autorun
-
-        autorun.bootstrap(host, port)
-    except Exception:
-        # Nothing here is worth failing a server start over.
-        pass
-
-
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 69b39e3a1642109c7928230fe0e05911862f162f
->>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
 def main() -> int:
     parser = argparse.ArgumentParser(description="Hoza YT server")
     parser.add_argument("--port", type=int, default=8765)
@@ -78,21 +58,6 @@ def main() -> int:
     parser.add_argument("--no-browser", action="store_true")
     parser.add_argument("--reload", action="store_true", help="reload on code changes")
     parser.add_argument(
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
-        "--no-bootstrap",
-        action="store_true",
-        help="do not set the server up to start with the browser (Windows). "
-             "The first run does that by itself, so nothing else is manual.",
-    )
-    parser.add_argument(
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 69b39e3a1642109c7928230fe0e05911862f162f
->>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
         "--data-dir",
         help="where this instance keeps its database and configuration. "
              "A second instance on the same machine needs its own.",
@@ -140,25 +105,6 @@ def main() -> int:
     if not args.no_browser:
         threading.Timer(1.0, lambda: webbrowser.open(url)).start()
 
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
-    # An extension cannot start a program, so one local run has to happen
-    # before anything can be automatic. This makes it this one: the first time
-    # the server is ever started it registers autorun, and from then on the
-    # server comes and goes with the browser without being asked. Already
-    # registered, this notices in milliseconds and does nothing.
-    if not args.no_bootstrap:
-        threading.Thread(
-            target=_bootstrap, args=(args.host, args.port), daemon=True
-        ).start()
-
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 69b39e3a1642109c7928230fe0e05911862f162f
->>>>>>> fb8a48e5deb82a316748a4a71b00a624c0adfc57
     uvicorn.run(
         "app.main:app",
         host=args.host,
