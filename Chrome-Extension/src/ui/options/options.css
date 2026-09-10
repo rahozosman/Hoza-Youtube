@@ -1,0 +1,318 @@
+/* ==========================================================================
+   Settings page
+   ========================================================================== */
+
+.shell {
+  display: grid;
+  grid-template-columns: 236px 1fr;
+  min-height: 100vh;
+  max-width: 1080px;
+  margin: 0 auto;
+}
+
+/* ---------------------------------------------------------------- sidebar */
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding: var(--space-6) var(--space-4);
+  border-right: 1px solid var(--border-faint);
+  position: sticky;
+  top: 0;
+  align-self: start;
+  height: 100vh;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 0 var(--space-2);
+}
+
+.brand-mark {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: var(--accent-gradient);
+  box-shadow: var(--accent-glow);
+  position: relative;
+  flex-shrink: 0;
+}
+
+.brand-mark::after {
+  content: "";
+  position: absolute;
+  inset: 9px;
+  background: rgba(255, 255, 255, 0.92);
+  clip-path: polygon(50% 0, 100% 55%, 72% 55%, 72% 100%, 28% 100%, 28% 55%, 0 55%);
+  transform: rotate(180deg);
+}
+
+.brand h1 {
+  font-size: var(--text-lg);
+  line-height: 1.15;
+}
+
+.brand p { font-size: var(--text-xs); }
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.nav-item {
+  padding: 8px var(--space-3);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--text-muted);
+  font: inherit;
+  font-weight: var(--weight-medium);
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+}
+
+.nav-item:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+
+.nav-item[aria-selected="true"] {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.nav-item:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.sidebar-foot { margin-top: auto; }
+
+/* ---------------------------------------------------------------- content */
+
+.content {
+  padding: var(--space-6) var(--space-6) var(--space-7);
+  min-width: 0;
+  position: relative;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  max-width: 620px;
+}
+
+.section-head h2 {
+  font-size: var(--text-xl);
+}
+
+.section-head p {
+  color: var(--text-muted);
+  font-size: var(--text-md);
+  margin-top: var(--space-1);
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  border: 1px solid var(--border-faint);
+  overflow: hidden;
+  backdrop-filter: blur(var(--blur));
+  -webkit-backdrop-filter: blur(var(--blur));
+}
+
+.setting {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--border-faint);
+}
+
+.setting:last-child { border-bottom: none; }
+
+.setting-text {
+  min-width: 0;
+  flex: 1;
+}
+
+.setting-label {
+  font-weight: var(--weight-medium);
+  font-size: var(--text-md);
+}
+
+.setting-help {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  margin-top: 2px;
+  line-height: 1.5;
+}
+
+.setting-control {
+  flex-shrink: 0;
+  min-width: 150px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.setting-control.is-wide { min-width: 220px; }
+
+.setting-control .switch { min-width: 0; }
+
+/* Stacked variant for controls that need the full width. */
+.setting-stacked {
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-3);
+}
+
+.setting-stacked .setting-control {
+  min-width: 0;
+  justify-content: stretch;
+}
+
+.setting-stacked .setting-control > * { width: 100%; }
+
+.preview {
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--surface-sunken);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  word-break: break-all;
+}
+
+.token-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.token {
+  padding: 3px 8px;
+  border-radius: var(--radius-xs);
+  background: var(--surface-sunken);
+  border: 1px solid var(--border-faint);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+}
+
+.token:hover {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-color: var(--accent-border);
+}
+
+/* Per-site list */
+.site-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.site-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--surface-sunken);
+  border: 1px solid var(--border-faint);
+}
+
+.site-origin {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+}
+
+/* Privacy statement */
+.statement {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--surface-sunken);
+  border: 1px solid var(--border-faint);
+  font-size: var(--text-md);
+  line-height: 1.6;
+}
+
+.statement ul {
+  margin: 0;
+  padding-left: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  color: var(--text-muted);
+}
+
+.statement strong { color: var(--text); }
+
+.perm-list {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-2) var(--space-4);
+  font-size: var(--text-sm);
+}
+
+.perm-list dt {
+  font-family: var(--font-mono);
+  color: var(--text);
+}
+
+.perm-list dd {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.toast-slot {
+  position: fixed;
+  right: var(--space-5);
+  bottom: var(--space-5);
+  max-width: 340px;
+  z-index: 30;
+}
+
+.toast-slot .toast {
+  background: var(--surface-solid);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--border);
+}
+
+.danger-zone {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+@media (max-width: 760px) {
+  .shell { grid-template-columns: 1fr; }
+
+  .sidebar {
+    position: static;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--border-faint);
+  }
+
+  .nav { flex-direction: row; flex-wrap: wrap; }
+  .content { padding: var(--space-5) var(--space-4); }
+  .setting { flex-direction: column; align-items: stretch; }
+  .setting-control { justify-content: stretch; min-width: 0; }
+  .setting-control > * { width: 100%; }
+}

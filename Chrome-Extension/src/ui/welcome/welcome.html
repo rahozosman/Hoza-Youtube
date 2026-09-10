@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Set up Hoza YT</title>
+    <link rel="stylesheet" href="../shared/tokens.css" />
+    <link rel="stylesheet" href="../shared/components.css" />
+    <link rel="stylesheet" href="welcome.css" />
+  </head>
+  <body class="welcome">
+    <main class="sheet">
+      <header class="sheet-head">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <div>
+          <h1>Hoza YT is installed</h1>
+          <p class="lede">One more step before the first download.</p>
+        </div>
+      </header>
+
+      <!-- Live, so the page answers the question it just raised. -->
+      <div class="status" id="status" data-state="unknown">
+        <span class="status-dot" aria-hidden="true"></span>
+        <div>
+          <p class="status-title" id="status-title">Looking for the app…</p>
+          <p class="status-body" id="status-body">Checking whether Hoza YT is running on this computer.</p>
+        </div>
+        <button id="recheck" class="btn btn-primary btn-sm" type="button">Check again</button>
+      </div>
+
+      <section class="steps">
+        <h2>Install the Hoza YT app</h2>
+        <p class="note">
+          The extension finds the media and manages the queue. The downloading
+          itself &mdash; and everything YouTube needs &mdash; happens in the
+          Hoza YT app on your computer. Install it once and it takes care of
+          itself from then on.
+        </p>
+
+        <ol>
+          <li>
+            <h3>Run <code>HozaYT-Setup.exe</code></h3>
+            <p>
+              It is in the folder named <code>1 - Install the app</code>, next
+              to the one you just loaded into Chrome. Double-click it and follow
+              the installer.
+            </p>
+          </li>
+          <li>
+            <h3>That is the whole step</h3>
+            <p>
+              The installer connects Hoza YT to your browser and starts the
+              engine. Nothing needs to be launched, configured or left open
+              &mdash; the app starts by itself whenever this extension needs it.
+            </p>
+          </li>
+          <li>
+            <h3>Come back here</h3>
+            <p>
+              The banner above turns green the moment the app answers. Then open
+              a video page and click the Hoza YT icon in the toolbar.
+            </p>
+          </li>
+        </ol>
+
+        <details>
+          <summary>Already installed it?</summary>
+          <p>
+            Open <strong>Hoza YT</strong> from the Start menu once, then press
+            Check again. If it still does not answer, run
+            <code>HozaYT.exe --verify</code> from the install folder &mdash; it
+            checks the browser connection and reports what is wrong.
+          </p>
+        </details>
+
+        <details>
+          <summary>Running from source instead?</summary>
+          <p>
+            Start the development server with
+            <code>python server/server.py</code> from the project folder. It
+            listens on <code>127.0.0.1:8765</code>, which is where the extension
+            looks when no installed app answers.
+          </p>
+        </details>
+      </section>
+
+      <footer class="sheet-foot">
+        <button id="open-dashboard" class="btn btn-ghost btn-sm" type="button" hidden>
+          Open the dashboard
+        </button>
+        <p class="faint">You can reopen this page from the panel at any time.</p>
+      </footer>
+    </main>
+
+    <script type="module" src="welcome.js"></script>
+  </body>
+</html>
