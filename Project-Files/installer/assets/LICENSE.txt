@@ -1,0 +1,57 @@
+Hoza YT
+Terms of use
+
+Copyright (c) Rahoz Osman. All rights reserved.
+
+
+WHAT THIS SOFTWARE IS FOR
+
+Hoza YT downloads media that a page makes openly available, to the computer it
+is installed on. It is intended for media you are authorised to download.
+
+You are responsible for the use you make of it, including compliance with the
+terms of the sites you visit and with the copyright law that applies to you.
+
+
+WHAT IT DELIBERATELY DOES NOT DO
+
+  - It does not bypass DRM or encrypted media.
+  - It does not bypass paywalls, sign-in walls or other access controls.
+  - It does not create qualities a source does not offer.
+
+
+WHAT IT INSTALLS
+
+  - The Hoza YT local engine, which runs only on this computer.
+  - The media tools the engine needs.
+  - A browser connection (Chrome native messaging), registered for the
+    signed-in user only.
+
+The engine listens on this computer's loopback address and is reachable only
+from this computer. It starts when your browser needs it and stops when your
+browser closes.
+
+
+YOUR DATA
+
+Settings, download history and the local database are stored on this computer.
+Nothing is uploaded, and the application contains no analytics, no third-party
+scripts and no remote code.
+
+
+OTHER PEOPLE'S SOFTWARE
+
+This application is distributed with third-party components, including FFmpeg
+and yt-dlp, each under its own licence. Those licences and the locations of the
+corresponding source code are listed in THIRD-PARTY-NOTICES.txt in the
+installation folder, alongside copies of the licences themselves.
+
+FFmpeg is included as a separate, unmodified executable that the application
+runs as its own process. It is not linked into Hoza YT.
+
+
+NO WARRANTY
+
+This software is provided "as is", without warranty of any kind, express or
+implied. The author is not liable for any claim, damages or other liability
+arising from the software or its use.

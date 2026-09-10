@@ -1,0 +1,22 @@
+{
+  "name": "hoza-yt",
+  "version": "3.0.0",
+  "private": true,
+  "description": "Hoza YT browser extension and local media engine.",
+  "author": "Rahoz Osman <hozahoza2001@gmail.com>",
+  "homepage": "https://github.com/rahozosman/download-youtube-vedio",
+  "scripts": {
+    "build:installer": "python build/build.py",
+    "build:installer:fast": "python build/build.py --skip-engine",
+    "build:installer:slim": "python build/build.py --no-ffmpeg",
+    "build:extension": "python build/build.py --no-installer --skip-engine",
+    "dev": "python server/server.py",
+    "dev:no-browser": "python server/server.py --no-browser",
+    "verify": "python native-host/run.py --verify",
+    "diagnose": "python native-host/run.py --diagnose",
+    "check": "python build/check.py"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

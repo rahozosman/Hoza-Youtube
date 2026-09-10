@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Hoza YT test page — openly downloadable media</title>
+    <meta property="og:title" content="Hoza YT Test — Big Buck Bunny" />
+    <meta
+      property="og:image"
+      content="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/BigBuckBunny.jpg"
+    />
+    <style>
+      :root { color-scheme: dark; }
+      body {
+        margin: 0;
+        font: 15px/1.6 -apple-system, "Segoe UI", Roboto, sans-serif;
+        background: #0a0a11;
+        color: #f2f2f7;
+        padding: 40px 20px 80px;
+      }
+      main { max-width: 760px; margin: 0 auto; }
+      h1 { font-size: 24px; letter-spacing: -0.02em; }
+      h2 { font-size: 17px; margin-top: 40px; }
+      p { color: #a9a9b8; }
+      code {
+        font-family: ui-monospace, Consolas, monospace;
+        background: rgba(255, 255, 255, 0.08);
+        padding: 1px 6px;
+        border-radius: 5px;
+        font-size: 13px;
+        word-break: break-all;
+      }
+      video {
+        width: 100%;
+        border-radius: 12px;
+        background: #000;
+        margin-top: 12px;
+        display: block;
+      }
+      .card {
+        background: rgba(255, 255, 255, 0.045);
+        border: 1px solid rgba(255, 255, 255, 0.09);
+        border-radius: 14px;
+        padding: 20px;
+        margin-top: 16px;
+      }
+      a { color: #b366f5; font-weight: 600; }
+      .note {
+        background: rgba(139, 107, 255, 0.12);
+        border: 1px solid rgba(139, 107, 255, 0.38);
+        border-radius: 12px;
+        padding: 16px 18px;
+        margin-top: 28px;
+      }
+      .grid { display: grid; gap: 8px; }
+      ol { color: #a9a9b8; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Hoza YT test page</h1>
+      <p>
+        Every item below is content that is genuinely free to download — public
+        test streams and Creative-Commons video. Open the Hoza YT panel on this
+        page and each of the three should be detected.
+      </p>
+
+      <div class="note">
+        <strong>How to run this test</strong>
+        <ol>
+          <li>Open the Hoza YT panel while on this page.</li>
+          <li>
+            The MP4 below is in a real <code>&lt;video&gt;</code> tag and a
+            direct link, so it is detected with no extra permission.
+          </li>
+          <li>
+            For the HLS and DASH items, click <em>Grant access to this site</em>
+            in the panel — that is when Hoza YT requests the optional
+            <code>webRequest</code> permission — then <em>Scan again</em>.
+          </li>
+        </ol>
+      </div>
+
+      <h2>1. Progressive MP4 — Big Buck Bunny (CC-BY)</h2>
+      <p>
+        Delivered as one file, so it downloads through the browser's own engine
+        with real pause and resume.
+      </p>
+      <div class="card">
+        <video
+          controls
+          preload="metadata"
+          poster="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/BigBuckBunny.jpg"
+          src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+        ></video>
+        <p style="margin-top: 12px">
+          Direct link:
+          <a
+            href="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+            >BigBuckBunny.mp4</a
+          >
+        </p>
+      </div>
+
+      <h2>2. HLS — unencrypted multi-quality stream (Mux public test)</h2>
+      <p>
+        A master playlist with several resolutions. Hoza YT reads the variants,
+        lets you pick one, then fetches and joins the segments.
+      </p>
+      <div class="card grid">
+        <a href="https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8">
+          x36xhzz.m3u8 (HLS master)
+        </a>
+      </div>
+
+      <h2>3. DASH — unencrypted stream (Akamai public test)</h2>
+      <p>
+        A DASH manifest that separates video and audio tracks — which is exactly
+        where Hoza YT shows <em>Video only</em> and <em>Audio only</em>, because it
+        saves tracks as delivered rather than muxing them.
+      </p>
+      <div class="card grid">
+        <a href="https://dash.akamaized.net/akamai/bbb_30fps/bbb_30fps.mpd">
+          bbb_30fps.mpd (DASH manifest)
+        </a>
+      </div>
+
+      <div class="note" style="margin-top: 40px">
+        <strong>What this proves</strong>
+        <p style="margin: 8px 0 0">
+          If all three are detected and download, Hoza YT is working end to end:
+          DOM detection, network observation, HLS parsing, DASH parsing,
+          progressive download and segment assembly. Sites that expose media
+          openly — like these — are what it is built for. Sites that lock their
+          streams behind signatures and throttling, like YouTube, are the ones
+          it deliberately leaves alone.
+        </p>
+      </div>
+    </main>
+  </body>
+</html>
