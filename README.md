@@ -8,6 +8,8 @@ There are three things in this folder. You use two of them, once each.
 | **2** | `Chrome-Extension\` | Add to Chrome — point Chrome at this folder |
 | **3** | `Project-Files\` | The source code. Nothing here needs touching. |
 
+![The Hoza YT panel picking a quality on YouTube](Project-Files/docs/youtube-video-qualities.png)
+
 ---
 
 ## Step 1 — Install the app
@@ -44,6 +46,32 @@ Open a video page and click the Hoza YT icon.
 
 If the panel ever says the app isn't running, open **Hoza YT** from the Start
 menu and press **Try again**. After a normal install it shouldn't need asking.
+
+---
+
+## What you get
+
+The panel lists what the page actually offers — every resolution and every
+audio track, with real file sizes. Nothing is guessed, and nothing is
+substituted when the download starts.
+
+The picture at the top is the video picker. Audio works the same way, with the
+bitrate, codec and language of every track the source publishes:
+
+![Audio quality picker on YouTube](Project-Files/docs/youtube-audio-qualities.png)
+
+Anything that isn't YouTube goes through the dashboard: paste a link, analyse
+it, pick a quality.
+
+![Dashboard download page](Project-Files/docs/dashboard-download.png)
+
+Everything you have downloaded is listed with its size and result, and the
+files stay on your computer.
+
+![Download history](Project-Files/docs/dashboard-history.png)
+
+The dashboard opens by itself from the panel's **Dashboard** tab — it runs on
+your own machine, at `127.0.0.1`, and nothing leaves it.
 
 ---
 
